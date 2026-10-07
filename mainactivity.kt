@@ -1,23 +1,33 @@
 package com.shiv.executor
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import java.io.PrintWriter
+import java.io.StringWriter
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(50,100,50,50) }
-        val status = TextView(this).apply { text = "Shiv Executor - Idle\nBalance: ${ShivBackgroundService.getBalance()} SOL\nDaily Loss: ${RiskManager.dailyLoss}"; textSize = 18f }
-        val btn = Button(this).apply { text = "Start Background Service" }
-        btn.setOnClickListener {
-            startForegroundService(Intent(this, ShivBackgroundService::class.java))
-            status.text = "Service Started!"
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            val sw = StringWriter(); e.printStackTrace(PrintWriter(sw))
+            runOnUiThread { setContentView(TextView(this).apply { text = "CRASH LOG:\n\n${sw.toString()}" }) }
         }
-        layout.addView(status); layout.addView(btn)
-        setContentView(layout)
+        super.onCreate(savedInstanceState)
+        try {
+            val tv = TextView(this).apply { 
+                textSize = 16f
+                setPadding(40,100,40,40)
+                text = "Shiv Executor Running!\n\nBalance: ${ShivBackgroundService.getBalance()}\nDaily Loss: ${RiskManager.dailyLoss}\n\nService not started yet."
+            }
+            val scroll = ScrollView(this).apply { addView(tv) }
+            setContentView(scroll)
+            
+            // Start service safely
+            try { startForegroundService(Intent(this, ShivBackgroundService::class.java)) } catch (_: Exception) {}
+        } catch (e: Exception) {
+            val sw = StringWriter(); e.printStackTrace(PrintWriter(sw))
+            setContentView(TextView(this).apply { text = "ERROR:\n${sw.toString()}" })
+        }
     }
 }
