@@ -3,24 +3,13 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_HOME: /home/runner/android-sdk
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-      - run: |
-          cd /tmp
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          unzip -q commandlinetools-linux-11076708_latest.zip -d $ANDROID_HOME/cmdline-tools
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager platform-tools
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager platforms\;android-34
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager build-tools\;34.0.0
+      - uses: android-actions/setup-android@v3
       - run: |
           chmod +x./gradlew
          ./gradlew assembleDebug
