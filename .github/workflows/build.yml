@@ -27,4 +27,13 @@ jobs:
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          if [ -f ./gradlew ]; then
+          if [ -f./gradlew ]; then
+            chmod +x./gradlew
+           ./gradlew assembleDebug
+          else
+            gradle assembleDebug
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: app/build/outputs/apk/debug/*.apk
