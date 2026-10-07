@@ -18,10 +18,10 @@ jobs:
           unzip -q commandlinetools-linux-11076708_latest.zip -d $ANDROID_HOME/cmdline-tools
           mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager platform-tools platforms;android-34 build-tools;34.0.0
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
       - run: |
           chmod +x./gradlew
-          ./gradlew assembleDebug
+         ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: apk
