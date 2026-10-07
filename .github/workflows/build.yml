@@ -9,12 +9,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Build APK
-        run: |
-          chmod +x gradlew
-         ./gradlew assembleDebug
+      - uses: android-actions/setup-android@v3
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: assembleDebug
+          build-root-directory: app
       - uses: actions/upload-artifact@v4
         with:
           name: shiv-private-apk
