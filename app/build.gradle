@@ -6,7 +6,6 @@ plugins {
 android {
     namespace 'com.shiv.executor'
     compileSdk 34
-
     defaultConfig {
         applicationId "com.shiv.executor"
         minSdk 24
@@ -14,25 +13,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
+    buildTypes { release { minifyEnabled false } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-    sourceSets {
-        main {
-            manifest.srcFile '../AndroidManifest.xml'
-            java.srcDirs = ['../']
-        }
-    }
+    kotlinOptions { jvmTarget = '17' }
 }
 
 dependencies {
