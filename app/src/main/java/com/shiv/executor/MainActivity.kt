@@ -48,6 +48,22 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.RED)
             setTextColor(Color.WHITE)
         }
+val connectBtn = Button(this).apply {
+    text = "CONNECT SEEKER VAULT"
+    setBackgroundColor(Color.CYAN)
+    setTextColor(Color.BLACK)
+}
+connectBtn.setOnClickListener {
+    // Run in coroutine
+    kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+        logText.append("\n[Seeker] Connecting to Seed Vault...")
+        val pubkey = SeekerVaultTrader.connectToSeedVault(this@MainActivity)
+        logText.append("\n[Seeker] Wallet: ${pubkey.take(8)}...")
+        logText.append("\n[Seeker] Balance: ${SeekerVaultTrader.solBalance} SOL")
+        statusText.text = "Connected: ${SeekerVaultTrader.solBalance} SOL"
+    }
+}
+layout.addView(connectBtn, 2) // Add near top
 
         logText = TextView(this).apply {
             text = "Log: Ready.\nBuild #87 fixed.\nWaiting for START..."
