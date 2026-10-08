@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var perTradeInput: TextInputEditText
     private lateinit var amountInput: TextInputEditText
     private lateinit var slippageInput: TextInputEditText
-    private lateinit var autoStopSwitch: SwitchMaterial
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -35,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         perTradeInput = findViewById(R.id.perTradeInput)
         amountInput = findViewById(R.id.amountInput)
         slippageInput = findViewById(R.id.slippageInput)
-        autoStopSwitch = findViewById(R.id.autoStopSwitch)
 
         val connectBtn = findViewById<MaterialButton>(R.id.connectBtn)
         val startBtn = findViewById<MaterialButton>(R.id.startBtn)
@@ -49,9 +47,8 @@ class MainActivity : AppCompatActivity() {
                     log(pubkey)
                 } else {
                     walletText.text = "${pubkey.take(4)}...${pubkey.takeLast(4)}"
-                    balanceText.text = "%.3f SOL".format(SeekerVaultTrader.solBalance)
+                    balanceText.text = "%.4f SOL".format(SeekerVaultTrader.solBalance)
                     log("> Connected: ${SeekerVaultTrader.solBalance} SOL")
-                    log("> Wallet: $pubkey")
                     statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00FF88.toInt())
                     statusLabel.text = " CONNECTED"
                 }
@@ -60,10 +57,11 @@ class MainActivity : AppCompatActivity() {
 
         startBtn.setOnClickListener {
             try {
-                // Apply tweaks
+                // APPLY BEST DEFAULTS - USER CAN TWEAK BUT FALLBACK TO BEST
                 JupiterRealTrader.maxDailyLoss = dailyStopInput.text.toString().toDoubleOrNull()?: 0.1
-                JupiterRealTrader.maxPerTradeLossPercent = perTradeInput.text.toString().toDoubleOrNull()?: 10.0
-                val amountSol = amountInput.text.toString().toDoubleOrNull()?: 0.01
+                JupiterRealTrader.maxPerTradeLossPercent = perTradeInput.text.toString().toDoubleOrNull()?: 8.0
+                JupiterRealTrader.defaultSlippageBps = slippageInput.text.toString().toIntOrNull()?: 150
+                val amountSol = amountInput.text.toString().toDoubleOrNull()?: 0.02
                 val lamports = (amountSol * 1_000_000_000).toLong().toString()
 
                 statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00FF88.toInt())
@@ -72,10 +70,12 @@ class MainActivity : AppCompatActivity() {
                 log("> START V4 REAL")
                 log("> Daily Stop: ${JupiterRealTrader.maxDailyLoss} SOL")
                 log("> Per Trade: ${JupiterRealTrader.maxPerTradeLossPercent}%")
-                log("> Amount: $amountSol SOL")
+                log("> Amount: $amountSol SOL (${lamports} lamports)")
+                log("> Slippage: ${JupiterRealTrader.defaultSlippageBps} BPS")
+                log("> Priority: ${JupiterRealTrader.defaultPriorityFee} lamports")
 
                 scope.launch {
-                    val result = SeekerVaultTrader.executeRealTrade(this@MainActivity, lamports)
+                    val result = SeekerVaultTrader.executeRealTrade(this@MainActivity, lamports, JupiterRealTrader.defaultSlippageBps)
                     log(result)
                 }
             } catch (e: Exception) {
@@ -87,14 +87,13 @@ class MainActivity : AppCompatActivity() {
             JupiterRealTrader.isTradingEnabled = false
             statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFFF3B30.toInt())
             statusLabel.text = " STOPPED"
-            log("> STOPPED by user")
+            log("> STOPPED")
             log("> Daily Loss: ${JupiterRealTrader.dailyLossSOL} SOL")
         }
     }
 
     private fun log(msg: String) {
         logText.append("\n> $msg")
-        // Auto scroll logic handled by ScrollView
     }
 
     override fun onDestroy() {
