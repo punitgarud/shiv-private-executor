@@ -29,9 +29,7 @@ object SeekerVaultTrader {
                     getSolBalance(resultPubkey)
                 }
                 resultPubkey
-            } catch (e: Exception) { 
-                "ERROR: ${e.message}" 
-            }
+            } catch (e: Exception) { "ERROR: ${e.message}" }
         }
     }
 
@@ -39,76 +37,66 @@ object SeekerVaultTrader {
         try {
             val client = OkHttpClient()
             val json = JSONObject().apply {
-                put("jsonrpc", "2.0")
-                put("id", 1)
+                put("jsonrpc", "2.0"); put("id", 1)
                 put("method", "getBalance")
                 put("params", org.json.JSONArray().put(pubkey))
             }
             val req = Request.Builder().url(RPC_URL)
-               .post(json.toString().toRequestBody("application/json".toMediaType()))
-               .build()
+               .post(json.toString().toRequestBody("application/json".toMediaType())).build()
             val resp = client.newCall(req).execute().body?.string()?: return 0.0
             val lamports = JSONObject(resp).getJSONObject("result").getLong("value")
             solBalance = lamports / 1_000_000_000.0
             return solBalance
-        } catch (e: Exception) { 
-            return 0.0 
-        }
+        } catch (e: Exception) { return 0.0 }
     }
 
-    suspend fun executeRealTrade(activity: android.app.Activity, amountLamports: String): String {
+    suspend fun executeRealTrade(activity: android.app.Activity, amountLamports: String, slippageBps: Int = 150): String {
         return withContext(Dispatchers.IO) {
             try {
                 if (userPublicKey == null) return@withContext "Connect Seeker first"
-                if (JupiterRealTrader.dailyLossSOL >= 0.1) {
+                if (JupiterRealTrader.dailyLossSOL >= JupiterRealTrader.maxDailyLoss) {
                     JupiterRealTrader.isTradingEnabled = false
-                    return@withContext "DAILY STOPLOSS 0.1 SOL HIT"
+                    return@withContext "DAILY STOPLOSS ${JupiterRealTrader.maxDailyLoss} SOL HIT"
                 }
 
                 val client = OkHttpClient()
 
-                // 1. Get Jupiter quote
-                val quoteUrl = "https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=$amountLamports&slippageBps=100"
+                // 1. Quote with best slippage default 150 BPS
+                val quoteUrl = "https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=$amountLamports&slippageBps=$slippageBps"
                 val quoteResp = client.newCall(Request.Builder().url(quoteUrl).build()).execute().body?.string()?: return@withContext "Quote failed"
 
-                // 2. Get unsigned swap tx from Jupiter
+                // 2. Swap tx with best priority fee 20000
                 val swapJson = JSONObject().apply {
                     put("quoteResponse", JSONObject(quoteResp))
                     put("userPublicKey", userPublicKey)
                     put("wrapAndUnwrapSol", true)
                     put("dynamicComputeUnitLimit", true)
-                    put("prioritizationFeeLamports", 10000)
+                    put("prioritizationFeeLamports", JupiterRealTrader.defaultPriorityFee)
                 }
                 val swapReq = Request.Builder().url("https://quote-api.jup.ag/v6/swap")
-                   .post(swapJson.toString().toRequestBody("application/json".toMediaType()))
-                   .build()
+                   .post(swapJson.toString().toRequestBody("application/json".toMediaType())).build()
                 val swapRespStr = client.newCall(swapReq).execute().body?.string()?: return@withContext "Swap API failed"
                 val swapTxBase64 = JSONObject(swapRespStr).getString("swapTransaction")
                 val swapTxBytes = Base64.decode(swapTxBase64, Base64.DEFAULT)
 
-                // 3. Ask Seed Vault to sign + Send via Helius
+                // 3. Sign via Seed Vault + Send via Helius Mumbai edge
                 val walletAdapter = MobileWalletAdapter()
                 var txSignature = ""
                 walletAdapter.transact(activity) { authResult ->
                     val signed = authResult.signTransactions(arrayOf(swapTxBytes))
                     val signedTxBase64 = Base64.encodeToString(signed.signedPayloads[0], Base64.NO_WRAP)
-
                     val sendJson = JSONObject().apply {
-                        put("jsonrpc", "2.0")
-                        put("id", 1)
+                        put("jsonrpc", "2.0"); put("id", 1)
                         put("method", "sendTransaction")
                         put("params", org.json.JSONArray().put(signedTxBase64).put(JSONObject().put("encoding","base64")))
                     }
                     val sendReq = Request.Builder().url(RPC_URL)
-                       .post(sendJson.toString().toRequestBody("application/json".toMediaType()))
-                       .build()
+                       .post(sendJson.toString().toRequestBody("application/json".toMediaType())).build()
                     val sendResp = client.newCall(sendReq).execute().body?.string()?: ""
                     txSignature = JSONObject(sendResp).optString("result", sendResp)
                 }
-                "SUCCESS: $txSignature"
-            } catch (e: Exception) { 
-                "TRADE ERROR: ${e.message}" 
-            }
+                "SUCCESS: $txSignature | ${JupiterRealTrader.dailyLossSOL}/${JupiterRealTrader.maxDailyLoss} SOL loss"
+            } catch (e: Exception) { "TRADE ERROR: ${e.message}" }
         }
     }
 }
