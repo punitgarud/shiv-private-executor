@@ -6,22 +6,61 @@ plugins {
 android {
     namespace 'com.shiv.executor'
     compileSdk 34
+    
     defaultConfig {
         applicationId "com.shiv.executor"
-        minSdk 24
+        minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1-seeker"
     }
-    buildTypes { release { minifyEnabled false } }
+    
+    buildTypes { 
+        release { 
+            minifyEnabled false 
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        } 
+        debug {
+            minifyEnabled false
+        }
+    }
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = '17' }
+    
+    kotlinOptions { 
+        jvmTarget = '17' 
+    }
+    
+    // Seeker needs this for MWA
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt']
+        }
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven { url "https://maven.solanamobile.com/releases" }
 }
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    
+    // Coroutines - required for wallet
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    
+    // Solana Seeker Wallet Adapter (Seed Vault)
+    implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.1.0'
+    
+    // Jupiter + Networking
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'org.json:json:20231013'
 }
