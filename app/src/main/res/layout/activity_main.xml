@@ -11,7 +11,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,7 +45,6 @@
                 android:layout_marginStart="6dp"/>
         </LinearLayout>
 
-        <!-- WALLET CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,7 +100,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- CONTROLS -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -135,7 +132,6 @@
                 app:strokeWidth="1dp"/>
         </LinearLayout>
 
-        <!-- SETTINGS CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -150,7 +146,7 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:text="TRADING SETTINGS"
+                    android:text="TRADING SETTINGS - BEST DEFAULTS"
                     android:textColor="#8E8E93"
                     android:textSize="11sp"
                     android:layout_width="wrap_content"
@@ -196,7 +192,7 @@
                             android:id="@+id/perTradeInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="10"
+                            android:text="8"
                             android:textColor="#FFF"
                             android:inputType="numberDecimal"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -221,7 +217,7 @@
                             android:id="@+id/amountInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="0.01"
+                            android:text="0.02"
                             android:textColor="#FFF"
                             android:inputType="numberDecimal"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -238,7 +234,7 @@
                             android:id="@+id/slippageInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="150"
                             android:textColor="#FFF"
                             android:inputType="number"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -266,7 +262,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- LOGS -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -289,15 +284,14 @@
 
                 <TextView
                     android:id="@+id/logText"
-                    android:text="> Ready...\n> Build #92 Dark Mode\n> Waiting for Seeker..."
+                    android:text="> Ready...\n> V4 REAL Dark Mode\n> Best Defaults Locked\n> Waiting for Seeker..."
                     android:textColor="#00FF88"
                     android:fontFamily="monospace"
                     android:textSize="11sp"
                     android:layout_marginTop="8dp"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"/>
+                    android:layout_height="220dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
     </LinearLayout>
 </ScrollView>
