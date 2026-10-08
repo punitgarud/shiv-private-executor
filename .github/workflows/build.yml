@@ -1,37 +1,27 @@
 name: Build APK
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fix messed up structure
+      - name: Force fix structure
         run: |
+          rm -rf app/src/main/java/com/shiv/executor/*
           mkdir -p app/src/main/java/com/shiv/executor
           mkdir -p app/src/main
-          # Move kt files from root to proper src (handle both names)
-          [ -f "JupiterTrader.kt" ] && cp "JupiterTrader.kt" app/src/main/java/com/shiv/executor/ || true
-          [ -f "RiskManager.kt" ] && cp "RiskManager.kt" app/src/main/java/com/shiv/executor/ || true
-          [ -f "Risk manager.kt" ] && cp "Risk manager.kt" app/src/main/java/com/shiv/executor/RiskManager.kt || true
-          [ -f "ShivBackgroundService.kt" ] && cp "ShivBackgroundService.kt" app/src/main/java/com/shiv/executor/ || true
-          # Move manifest if it's at root
-          [ -f "AndroidManifest.xml" ] && cp AndroidManifest.xml app/src/main/AndroidManifest.xml || true
-          ls -R app/src/main/
+          cp -f JupiterTrader.kt app/src/main/java/com/shiv/executor/ || true
+          cp -f RiskManager.kt app/src/main/java/com/shiv/executor/ || true
+          cp -f "Risk manager.kt" app/src/main/java/com/shiv/executor/RiskManager.kt || true
+          cp -f ShivBackgroundService.kt app/src/main/java/com/shiv/executor/ || true
+          cp -f MainActivity.kt app/src/main/java/com/shiv/executor/ || true
+          cp -f AndroidManifest.xml app/src/main/AndroidManifest.xml
+          echo "--- Manifest now ---"
+          cat app/src/main/AndroidManifest.xml
       - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
+        with: { distribution: temurin, java-version: 17, cache: gradle }
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.7
-      - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Shiv-APK
-          path: app/build/outputs/apk/debug/*.apk
+        with: { gradle-version: 8.7 }
+      - run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with: { name: Shiv-APK, path: app/build/outputs/apk/debug/*.apk }
