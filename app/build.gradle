@@ -5,28 +5,24 @@ plugins {
 
 android {
     namespace 'com.shiv.executor'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.shiv.executor"
         minSdk 24
-        targetSdk 34
-        versionCode 102
+        targetSdk 35
+        versionCode 105
         versionName "4.0-REAL"
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-        }
+        release { minifyEnabled false }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+    kotlinOptions { jvmTarget = '17' }
 }
 
 dependencies {
@@ -34,11 +30,17 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     
-    // SOLANA MWA - FIXED VERSIONS (2.0.8 exists, 2.1.2 does not)
     implementation 'com.solanamobile:mobile-wallet-adapter-clientlib:2.0.8'
     implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.8'
 
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    
+    // Force downgrade transitive core-ktx
+    constraints {
+        implementation('androidx.core:core-ktx:1.12.0') {
+            because '1.16.0 needs compileSdk 35 + AGP 8.6, force 1.12'
+        }
+    }
 }
