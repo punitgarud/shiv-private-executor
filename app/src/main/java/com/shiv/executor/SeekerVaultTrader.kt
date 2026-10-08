@@ -11,7 +11,7 @@ import org.json.JSONObject
 
 object SeekerVaultTrader {
     // ===== PASTE YOUR HELIUS KEY HERE =====
-    private const val HELIUS_KEY = "PASTE_YOUR_HELIUS_KEY_HERE"
+    private const val HELIUS_KEY = "f63bce9d-ab3b-48fa-a562-d8181b566d7d"
     private val RPC_URL = "https://mainnet.helius-rpc.com/?api-key=$HELIUS_KEY"
     // ======================================
 
