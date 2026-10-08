@@ -1,49 +1,44 @@
 package com.shiv.executor
 
-import android.content.Context
-import com.solana.mobile.seedvault.SeedVault
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 object JupiterRealTrader {
-    private val client = OkHttpClient()
-    private const val JUP_QUOTE = "https://quote-api.jup.ag/v6/quote"
-    private const val JUP_SWAP = "https://quote-api.jup.ag/v6/swap"
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .build()
 
-    // REAL TRADE - uses Seed Vault, never exposes key
-    suspend fun executeRealSwap(context: Context, inputMint: String, outputMint: String, amountLamports: Long): String? = withContext(Dispatchers.IO) {
+    var dailyLossSOL = 0.0
+    var maxDailyLoss = 0.1
+    var maxPerTradeLossPercent = 10.0
+    var isTradingEnabled = true
+    var lastQuote = "No quote yet"
+
+    fun checkStoploss(currentTradeLossSOL: Double, entryPrice: Double, currentPrice: Double): Boolean {
+        if (dailyLossSOL >= maxDailyLoss) {
+            isTradingEnabled = false
+            return true
+        }
+        val lossPercent = ((entryPrice - currentPrice) / entryPrice) * 100
+        if (lossPercent >= maxPerTradeLossPercent) {
+            dailyLossSOL += currentTradeLossSOL
+            return true
+        }
+        return false
+    }
+
+    fun getJupiterQuote(): String {
         try {
-            // 1. Get quote
-            val quoteUrl = "$JUP_QUOTE?inputMint=$inputMint&outputMint=$outputMint&amount=$amountLamports&slippageBps=50"
-            val quoteResp = client.newCall(Request.Builder().url(quoteUrl).build()).execute()
-            val quoteJson = quoteResp.body?.string() ?: return@withContext null
-            
-            // 2. Get swap transaction (unsigned)
-            val swapBody = JSONObject().apply {
-                put("quoteResponse", JSONObject(quoteJson))
-                put("userPublicKey", SeedVault.getWalletAddress(context)) // from Seed Vault
-                put("wrapAndUnwrapSol", true)
-            }
-            val req = Request.Builder().url(JUP_SWAP)
-                .post(RequestBody.create("application/json".toMediaType(), swapBody.toString())).build()
-            val swapResp = client.newCall(req).execute()
-            val swapTxBase64 = JSONObject(swapResp.body?.string()).getString("swapTransaction")
-
-            // 3. Sign inside Seed Vault (secure) - key never leaves enclave
-            val signedTx = SeedVault.signTransaction(context, swapTxBase64)
-
-            // 4. Send
-            val sendReq = JSONObject().apply { put("signedTransaction", signedTx) }
-            // ... send to RPC
-            
-            println("REAL TRADE EXECUTED: $amountLamports lamports $inputMint -> $outputMint")
-            return@withContext signedTx
+            val url = "https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000&slippageBps=100"
+            val request = Request.Builder().url(url).build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string() ?: "Empty"
+            lastQuote = if (body.length > 100) body.substring(0,100) + "..." else body
+            return body
         } catch (e: Exception) {
-            e.printStackTrace()
-            null
+            lastQuote = "ERROR: ${e.message}"
+            return lastQuote
         }
     }
 }
