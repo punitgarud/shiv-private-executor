@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "SHIV V4 REAL"
+rootProject.name = "shiv-private-executor"
 include ':app'
