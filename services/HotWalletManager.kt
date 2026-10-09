@@ -1,0 +1,2 @@
+suspend fun getBalanceSOL(ctx:android.content.Context):Double{ /* code from prev msg */ }
+fun getHotWalletPubkey(ctx:android.content.Context):String?{ return ctx.getSharedPreferences("shiv_hot",0).getString("hot_pubkey",null) }
