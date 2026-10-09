@@ -1,103 +1,39 @@
 package com.shiv.executor
-
+import android.app.AlertDialog
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.TextView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.*
-
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import com.shiv.executor.services.HotWalletManager
+import com.shiv.executor.services.ShivAutoService
 class MainActivity : AppCompatActivity() {
-    private lateinit var walletText: TextView
-    private lateinit var balanceText: TextView
-    private lateinit var statusDot: TextView
-    private lateinit var statusLabel: TextView
-    private lateinit var logText: TextView
-    private lateinit var dailyStopInput: TextInputEditText
-    private lateinit var perTradeInput: TextInputEditText
-    private lateinit var amountInput: TextInputEditText
-    private lateinit var slippageInput: TextInputEditText
-
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        walletText = findViewById(R.id.walletText)
-        balanceText = findViewById(R.id.balanceText)
-        statusDot = findViewById(R.id.statusDot)
-        statusLabel = findViewById(R.id.statusLabel)
-        logText = findViewById(R.id.logText)
-        dailyStopInput = findViewById(R.id.dailyStopInput)
-        perTradeInput = findViewById(R.id.perTradeInput)
-        amountInput = findViewById(R.id.amountInput)
-        slippageInput = findViewById(R.id.slippageInput)
-
-        val connectBtn = findViewById<MaterialButton>(R.id.connectBtn)
-        val startBtn = findViewById<MaterialButton>(R.id.startBtn)
-        val stopBtn = findViewById<MaterialButton>(R.id.stopBtn)
-
-        connectBtn.setOnClickListener {
-            scope.launch {
-                log("> Connecting to Seeker Vault...")
-                val pubkey = SeekerVaultTrader.connectToSeedVault(this@MainActivity)
-                if (pubkey.startsWith("ERROR")) {
-                    log(pubkey)
-                } else {
-                    walletText.text = "${pubkey.take(4)}...${pubkey.takeLast(4)}"
-                    balanceText.text = "%.4f SOL".format(SeekerVaultTrader.solBalance)
-                    log("> Connected: ${SeekerVaultTrader.solBalance} SOL")
-                    statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00FF88.toInt())
-                    statusLabel.text = " CONNECTED"
+        val layout = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(0xFF000000.toInt()); setPadding(40,100,40,40) }
+        val title = TextView(this).apply { text="SHIV PRIVATE EXECUTOR V4\nRisk Protected\n"; setTextColor(Color.WHITE); textSize=20f }; layout.addView(title)
+        val btnStart = Button(this).apply { text="Start Auto (Biometric)"; setBackgroundColor(0xFF00FF88.toInt()); setTextColor(Color.BLACK) }; layout.addView(btnStart)
+        val btnHistory = Button(this).apply { text="History & PnL + Export CSV"; setBackgroundColor(0xFF121212.toInt()); setTextColor(Color.WHITE) }; layout.addView(btnHistory)
+        val btnStop = Button(this).apply { text="Stop Service"; setBackgroundColor(0xFF1A1A1A.toInt()); setTextColor(Color.GRAY) }; layout.addView(btnStop)
+        val status = TextView(this).apply { text="Status: Idle\nTop4: Live | Fee: Lowest | Loss:-0.05 | MEV:1%\nBalance Guard: ON | Sharpe>1.5"; setTextColor(Color.GRAY); setPadding(0,30,0,0) }; layout.addView(status)
+        btnHistory.setOnClickListener{ startActivity(Intent(this, HistoryActivity::class.java)) }
+        btnStop.setOnClickListener{ stopService(Intent(this, ShivAutoService::class.java)); Toast.makeText(this,"Stopped",Toast.LENGTH_SHORT).show() }
+        btnStart.setOnClickListener{
+            val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this), object:BiometricPrompt.AuthenticationCallback(){
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult){ super.onAuthenticationSucceeded(result)
+                    val svc = Intent(this@MainActivity, ShivAutoService::class.java); ContextCompat.startForegroundService(this@MainActivity, svc); Toast.makeText(this@MainActivity,"V4 Risk Protected Started",Toast.LENGTH_LONG).show()
                 }
-            }
+            })
+            prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle("Unlock SHIV").setSubtitle("Start trading with biometric").setNegativeButtonText("Cancel").build())
         }
-
-        startBtn.setOnClickListener {
-            try {
-                // APPLY BEST DEFAULTS - USER CAN TWEAK BUT FALLBACK TO BEST
-                JupiterRealTrader.maxDailyLoss = dailyStopInput.text.toString().toDoubleOrNull()?: 0.1
-                JupiterRealTrader.maxPerTradeLossPercent = perTradeInput.text.toString().toDoubleOrNull()?: 8.0
-                JupiterRealTrader.defaultSlippageBps = slippageInput.text.toString().toIntOrNull()?: 150
-                val amountSol = amountInput.text.toString().toDoubleOrNull()?: 0.02
-                val lamports = (amountSol * 1_000_000_000).toLong().toString()
-
-                statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00FF88.toInt())
-                statusLabel.text = " RUNNING"
-
-                log("> START V4 REAL")
-                log("> Daily Stop: ${JupiterRealTrader.maxDailyLoss} SOL")
-                log("> Per Trade: ${JupiterRealTrader.maxPerTradeLossPercent}%")
-                log("> Amount: $amountSol SOL (${lamports} lamports)")
-                log("> Slippage: ${JupiterRealTrader.defaultSlippageBps} BPS")
-                log("> Priority: ${JupiterRealTrader.defaultPriorityFee} lamports")
-
-                scope.launch {
-                    val result = SeekerVaultTrader.executeRealTrade(this@MainActivity, lamports, JupiterRealTrader.defaultSlippageBps)
-                    log(result)
-                }
-            } catch (e: Exception) {
-                log("ERROR: ${e.message}")
-            }
+        if(intent.getStringExtra("action")=="refill"){
+            val amt = intent.getDoubleExtra("amount",0.5)
+            AlertDialog.Builder(this).setTitle("Refill Hot Wallet?").setMessage("Low balance detected (<0.05 SOL).\nRefill $amt SOL from Seed Vault now?\n\nTrading is paused until refilled.").setPositiveButton("Refill $amt SOL"){_,_->
+                Toast.makeText(this,"Refilling $amt SOL - implement Seed Vault transfer here",Toast.LENGTH_LONG).show()
+            }.setNegativeButton("Later",null).show()
         }
-
-        stopBtn.setOnClickListener {
-            JupiterRealTrader.isTradingEnabled = false
-            statusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFFF3B30.toInt())
-            statusLabel.text = " STOPPED"
-            log("> STOPPED")
-            log("> Daily Loss: ${JupiterRealTrader.dailyLossSOL} SOL")
-        }
-    }
-
-    private fun log(msg: String) {
-        logText.append("\n> $msg")
-    }
-
-    override fun onDestroy() {
-        scope.cancel()
-        super.onDestroy()
+        setContentView(layout)
     }
 }
