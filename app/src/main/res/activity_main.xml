@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0A0B">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="SHIV V4 REAL"
+                android:textColor="#00FF88"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"/>
+
+            <TextView
+                android:id="@+id/statusDot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@android:drawable/btn_default"
+                android:backgroundTint="#FF3B30"/>
+
+            <TextView
+                android:id="@+id/statusLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" IDLE"
+                android:textColor="#8E8E93"
+                android:textSize="12sp"
+                android:layout_marginStart="6dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1C1C1E"
+            app:strokeWidth="1dp"
+            app:strokeColor="#2C2C2E">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:text="SEEKER VAULT"
+                    android:textColor="#8E8E93"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/walletText"
+                    android:text="Not connected"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/balanceText"
+                    android:text="0.00 SOL"
+                    android:textColor="#00FF88"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/connectBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:text="CONNECT SEEKER VAULT"
+                    app:cornerRadius="12dp"
+                    android:textColor="#000000"
+                    app:backgroundTint="#00FF88"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:weightSum="2">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/startBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="START"
+                app:cornerRadius="12dp"
+                android:layout_marginEnd="6dp"
+                app:backgroundTint="#00FF88"
+                android:textColor="#000"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/stopBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="56dp"
+                android:text="STOP"
+                app:cornerRadius="12dp"
+                android:layout_marginStart="6dp"
+                app:backgroundTint="#2C2C2E"
+                android:textColor="#FF3B30"
+                app:strokeColor="#FF3B30"
+                app:strokeWidth="1dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1C1C1E">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:text="TRADING SETTINGS - BEST DEFAULTS"
+                    android:textColor="#8E8E93"
+                    android:textSize="11sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:weightSum="2">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxBackgroundColor="#2C2C2E"
+                        android:hint="Daily Stop SOL">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/dailyStopInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="0.1"
+                            android:textColor="#FFF"
+                            android:inputType="numberDecimal"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        app:boxBackgroundColor="#2C2C2E"
+                        android:hint="Per Trade %">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/perTradeInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="8"
+                            android:textColor="#FFF"
+                            android:inputType="numberDecimal"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:weightSum="2">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        app:boxBackgroundColor="#2C2C2E"
+                        android:hint="Amount / Trade (SOL)">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/amountInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="0.02"
+                            android:textColor="#FFF"
+                            android:inputType="numberDecimal"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        app:boxBackgroundColor="#2C2C2E"
+                        android:hint="Slippage BPS">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/slippageInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="150"
+                            android:textColor="#FFF"
+                            android:inputType="number"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/autoStopSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Auto Stoploss (Daily + Per Trade)"
+                    android:textColor="#FFFFFF"
+                    android:checked="true"
+                    app:thumbTint="#00FF88"
+                    app:trackTint="#2C2C2E"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/heliusSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Use Helius RPC (Fast)"
+                    android:textColor="#FFFFFF"
+                    android:checked="true"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#000000">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:text="LIVE LOGS"
+                    android:textColor="#8E8E93"
+                    android:textSize="11sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/logText"
+                    android:text="> Ready...\n> V4 REAL Dark Mode\n> Best Defaults Locked\n> Waiting for Seeker..."
+                    android:textColor="#00FF88"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>
