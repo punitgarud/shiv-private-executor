@@ -5,14 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [PositionEntity::class], version = 1, exportSchema = false)
+@Database(entities = [PositionEntity::class, TradeHistoryEntity::class], version = 2, exportSchema = false)
 abstract class ShivDatabase : RoomDatabase() {
     abstract fun positionDao(): PositionDao
 
     companion object {
         @Volatile
         private var INSTANCE: ShivDatabase? = null
-
         fun get(context: Context): ShivDatabase {
             return INSTANCE?: synchronized(this) {
                 val instance = Room.databaseBuilder(

@@ -1,7 +1,27 @@
 package com.shiv.executor.services.db
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+
 @Entity(tableName="positions")
-data class PositionEntity(@PrimaryKey val moduleId:String, val moduleName:String, val entryScore:Double, val entryTime:Long=System.currentTimeMillis(), val amountSOL:Double=0.1, val entryPrice:Double=0.0, val mint:String)
+data class PositionEntity(
+    @PrimaryKey val moduleId:String,
+    val moduleName:String,
+    val entryScore:Double,
+    val entryTime:Long=System.currentTimeMillis(),
+    val amountSOL:Double=0.1,
+    val entryPrice:Double=0.0,
+    val mint:String
+)
+
 @Entity(tableName="trade_history")
-data class TradeHistoryEntity(@PrimaryKey(autoGenerate=true) val id:Long=0, val moduleId:String, val moduleName:String, val type:String, val amountSOL:Double, val scoreAtTrade:Double, val pnlPct:Double=0.0, val timestamp:Long=System.currentTimeMillis(), val txSig:String="")
+data class TradeHistoryEntity(
+    @PrimaryKey(autoGenerate=true) val id:Long=0,
+    val moduleId:String,
+    val moduleName:String,
+    val type:String,
+    val amountSOL:Double,
+    val scoreAtTrade:Double,
+    val pnlPct:Double=0.0,
+    val timestamp:Long=System.currentTimeMillis(),
+    val txSig:String=""
+)
