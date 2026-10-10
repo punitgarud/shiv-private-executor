@@ -10,8 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "shiv-private-executor"
+rootProject.name = "SHIV Private Executor"
 include ':app'
