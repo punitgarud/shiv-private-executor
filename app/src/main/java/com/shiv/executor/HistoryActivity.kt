@@ -22,7 +22,7 @@ class HistoryActivity : AppCompatActivity() {
         val stats = TextView(this).apply { setTextColor(Color.GRAY); textSize=12f; setPadding(0,20,0,20) }; layout.addView(stats)
         val list = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }; layout.addView(list)
         scope.launch {
-            val db = ShivDatabase.get(this@HistoryActivity)
+import com.shiv.executor.services.db.ShivDatabase
             val history = withContext(Dispatchers.IO){ db.positionDao().getAllHistory() }
             val open = withContext(Dispatchers.IO){ db.positionDao().getAll() }
             val sells = history.filter{it.type=="SELL"}; val wins = sells.count{it.pnlPct>0}; val losses = sells.count{it.pnlPct<=0}
