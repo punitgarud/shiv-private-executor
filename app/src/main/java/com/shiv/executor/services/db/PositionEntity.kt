@@ -5,8 +5,12 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "positions")
 data class PositionEntity(
     @PrimaryKey val moduleId: String,
-    val entryPrice: Double,
-    val size: Double,
-    val side: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val moduleName: String = "",
+    val entryScore: Double = 0.0,
+    val timestamp: Long = System.currentTimeMillis(),
+    val amountSOL: Double = 0.0,
+    val entryPrice: Double = 0.0,
+    val mint: String = "",
+    val size: Double = 0.0,
+    val side: String = "BUY"
 )
