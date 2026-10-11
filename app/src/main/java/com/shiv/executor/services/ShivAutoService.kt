@@ -8,7 +8,6 @@ import com.shiv.executor.services.db.PositionEntity
 import com.shiv.executor.services.db.ShivDatabase
 import com.shiv.executor.services.db.TradeHistoryEntity
 import kotlinx.coroutines.*
-
 class ShivAutoService : Service() {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var running = false
@@ -22,15 +21,13 @@ class ShivAutoService : Service() {
     private val refillAmount = 0.5
     private var lastLowBalanceNotify = 0L
     private lateinit var db: ShivDatabase
-
-    override fun onCreate() { 
+    override fun onCreate() {
         super.onCreate()
         db = ShivDatabase.getDatabase(this)
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(NotificationChannel("shiv_auto","SHIV Auto",NotificationManager.IMPORTANCE_LOW))
         nm.createNotificationChannel(NotificationChannel("shiv_alert","SHIV Alerts",NotificationManager.IMPORTANCE_HIGH))
     }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(running) return START_STICKY; running=true
         val pendingMain = PendingIntent.getActivity(this,0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
@@ -51,20 +48,20 @@ class ShivAutoService : Service() {
                     for(m in top4){
                         if(m.signal=="BUY" && (m.sharpe < 1.5 || m.winRate < 65 || m.maxDrawdown < -10.0)) continue
                         when(m.signal.uppercase()){
-                            "BUY" -> if(m.score>=85 && !openPositions.containsKey(m.id)){
+                            "BUY" -> if(m.score>=85 &&!openPositions.containsKey(m.id)){
                                 val q = JupiterService.getBestQuote((amountSOL*1e9).toLong(), slippagePct*100)
                                 if(q==null || JupiterService.lastImpact > mevImpactLimit) continue
                                 db.positionDao().insert(PositionEntity(moduleId=m.id, moduleName=m.name, entryScore=m.score, amountSOL=amountSOL, entryPrice=m.entryPrice, mint=m.mint, timestamp=System.currentTimeMillis()))
-                                db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="BUY", action="BUY", amountSOL=amountSOL, amountSOL=amountSOL, scoreAtTrade=m.score, timestamp=System.currentTimeMillis()))
+                                db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="BUY", action="BUY", amountSOL=amountSOL, scoreAtTrade=m.score, timestamp=System.currentTimeMillis()))
                             }
                             "SELL" -> {
-                                val pos = openPositions[m.id] ?: continue
+                                val pos = openPositions[m.id]?: continue
                                 val pnl = (m.score - pos.entryScore)/pos.entryScore*100
                                 if(m.score<50 || pnl>=takeProfitPct || pnl<=-stopLossPct){
                                     val q = JupiterService.getBestQuoteReverse((amountSOL*1e9).toLong(), slippagePct*100)
                                     if(q==null || JupiterService.lastImpact > mevImpactLimit) continue
                                     db.positionDao().delete(m.id)
-                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", action="SELL", amountSOL=amountSOL, amountSOL=amountSOL, scoreAtTrade=m.score, pnlPct=pnl, pnl=pnl, timestamp=System.currentTimeMillis()))
+                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", action="SELL", amountSOL=amountSOL, scoreAtTrade=m.score, pnlPct=pnl, pnl=pnl, timestamp=System.currentTimeMillis()))
                                 }
                             }
                         }
@@ -75,13 +72,11 @@ class ShivAutoService : Service() {
         }
         return START_STICKY
     }
-
     private suspend fun shouldPauseForLoss(): Boolean {
         val history = db.positionDao().getHistory()
         val todayLossSOL = history.filter{ it.timestamp > System.currentTimeMillis()-86400000 && it.type=="SELL" && it.pnlPct<0 }.sumOf{ it.pnlPct/100 * it.amountSOL }
         return todayLossSOL <= -dailyLossLimitSOL
     }
-
     private fun notifyAlert(title:String, text:String, withRefillAction:Boolean){
         val nm = getSystemService(NotificationManager::class.java)
         val builder = Notification.Builder(this,"shiv_alert").setContentTitle(title).setContentText(text).setSmallIcon(android.R.drawable.stat_notify_error).setStyle(Notification.BigTextStyle().bigText(text))

@@ -13,10 +13,10 @@ object PerformanceService {
     suspend fun fetchTop4(): List<ModulePerf> = withContext(Dispatchers.IO){
         try{
             val req = Request.Builder().url(DATA_URL).build()
-            val body = client.newCall(req).execute().body?.string() ?: return@withContext emptyList()
+            val body = client.newCall(req).execute().body?.string()?: return@withContext emptyList()
             val root = JSONObject(body)
             lastSolPrice = root.optDouble("solPriceUsd", 152.0)
-            val arr = root.optJSONArray("top4") ?: return@withContext emptyList()
+            val arr = root.optJSONArray("top4")?: return@withContext emptyList()
             val list = mutableListOf<ModulePerf>()
             for(i in 0 until arr.length()){
                 val o = arr.getJSONObject(i)
