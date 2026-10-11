@@ -6,27 +6,30 @@ interface PositionDao {
     @Query("SELECT * FROM positions")
     suspend fun getAll(): List<PositionEntity>
 
-    @Query("SELECT * FROM trade_history ORDER BY timestamp DESC")
-    suspend fun getHistory(): List<TradeHistoryEntity>
+    @Query("SELECT * FROM positions")
+    suspend fun getAllPositions(): List<PositionEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(position: PositionEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPosition(position: PositionEntity)
+
+    @Query("DELETE FROM positions WHERE moduleId = :moduleId")
+    suspend fun delete(moduleId: String)
+
+    @Query("DELETE FROM positions WHERE moduleId = :moduleId")
+    suspend fun deleteById(moduleId: String)
 
     @Query("SELECT * FROM trade_history ORDER BY timestamp DESC")
     suspend fun getAllHistory(): List<TradeHistoryEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPosition(pos: PositionEntity)
+    @Query("SELECT * FROM trade_history ORDER BY timestamp DESC")
+    suspend fun getHistory(): List<TradeHistoryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(pos: PositionEntity)
+    suspend fun insertHistory(history: TradeHistoryEntity)
 
-    @Insert
-    suspend fun insertHistory(trade: TradeHistoryEntity)
-
-    @Query("DELETE FROM positions WHERE moduleId = :id")
-    suspend fun deletePosition(id: String)
-
-    @Query("DELETE FROM positions WHERE moduleId = :id")
-    suspend fun delete(id: String)
-
-    @Query("SELECT * FROM positions WHERE moduleId = :id LIMIT 1")
-    suspend fun getById(id: String): PositionEntity?
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTradeHistory(history: TradeHistoryEntity)
 }
