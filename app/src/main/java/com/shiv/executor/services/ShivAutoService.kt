@@ -50,7 +50,7 @@ class ShivAutoService : Service() {
                                     val q = JupiterService.getBestQuoteReverse((amountSOL*1e9).toLong(), slippagePct*100)
                                     if(q==null || JupiterService.lastImpact > mevImpactLimit) continue
                                     db.positionDao().delete(m.id)
-                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", amountSOL=amountSOL, scoreAtTrade=m.score, pnlPct=pnl))
+                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", amountSol=amountSOL, scoreAtTrade=m.score, pnlPct=pnl))
                                 }
                             }
                         }
@@ -63,7 +63,7 @@ class ShivAutoService : Service() {
     }
     private suspend fun shouldPauseForLoss(): Boolean {
         val history = db.positionDao().getHistory()
-        val todayLossSOL = history.filter{ it.timestamp > System.currentTimeMillis()-86400000 && it.type=="SELL" && it.pnlPct<0 }.sumOf{ it.pnlPct/100 * it.amountSOL }
+        val todayLossSOL = history.filter{ it.timestamp > System.currentTimeMillis()-86400000 && it.type=="SELL" && it.pnlPct<0 }.sumOf{ it.pnlPct/100 * it.amountSol }
         return todayLossSOL <= -dailyLossLimitSOL
     }
     private fun notifyAlert(title:String, text:String, withRefillAction:Boolean){
