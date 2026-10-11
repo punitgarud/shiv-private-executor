@@ -1,8 +1,9 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android' version '1.9.22'
+    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
+
 android {
     namespace 'com.shiv.executor'
     compileSdk 34
@@ -21,18 +22,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = '17' }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 }
+
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.room:room-ktx:2.6.1'
-    kapt 'androidx.room:room-compiler:2.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    // Seeker MWA - official version for Seeker dApps
     implementation 'com.solanamobile:mobile-wallet-adapter-clientlib:2.0.8'
     implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.8'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
