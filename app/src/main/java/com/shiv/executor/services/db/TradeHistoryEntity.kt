@@ -6,8 +6,15 @@ import androidx.room.PrimaryKey
 data class TradeHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val moduleId: String,
-    val action: String,
-    val price: Double,
-    val pnl: Double,
-    val timestamp: Long = System.currentTimeMillis()
+    val moduleName: String = "",
+    val type: String = "BUY", // BUY/SELL - alias for action
+    val action: String = "BUY",
+    val amountSOL: Double = 0.0,
+    val amountSol: Double = 0.0,
+    val scoreAtTrade: Double = 0.0,
+    val pnlPct: Double = 0.0,
+    val pnl: Double = 0.0,
+    val price: Double = 0.0,
+    val timestamp: Long = System.currentTimeMillis(),
+    val txSig: String = ""
 )
