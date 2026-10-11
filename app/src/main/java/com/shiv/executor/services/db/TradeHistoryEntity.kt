@@ -7,10 +7,9 @@ data class TradeHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val moduleId: String,
     val moduleName: String = "",
-    val type: String = "BUY", // BUY/SELL - alias for action
+    val type: String = "BUY",
     val action: String = "BUY",
     val amountSOL: Double = 0.0,
-    val amountSol: Double = 0.0,
     val scoreAtTrade: Double = 0.0,
     val pnlPct: Double = 0.0,
     val pnl: Double = 0.0,

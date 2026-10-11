@@ -30,7 +30,7 @@ class HistoryActivity : AppCompatActivity() {
             val wins = sells.count{it.pnlPct>0}
             val losses = sells.count{it.pnlPct<=0}
             val totalPnlPct = sells.sumOf{it.pnlPct}
-            val totalPnlUsd = sells.sumOf{ it.pnlPct/100 * it.amountSol * PerformanceService.lastSolPrice }
+            val totalPnlUsd = sells.sumOf{ it.pnlPct/100 * it.amountSOL * PerformanceService.lastSolPrice }
             val winRate = if((wins+losses)>0) wins*100.0/(wins+losses) else 0.0
             stats.text = "SOL $${"%.2f".format(PerformanceService.lastSolPrice)} | LossLimit:-0.05 MEV:1%\nOpen:${open.size} Closed:${wins+losses} Win:$wins Loss:$losses\nWinRate:${"%.1f".format(winRate)}% Total:${"%.2f".format(totalPnlPct)}% ($${"%.2f".format(totalPnlUsd)})\nBuffer:0.02 Fee:LOWEST Sharpe:>1.5\n\n--- OPEN ---\n" + open.joinToString("\n"){ "• ${it.moduleName} entry=${"%.1f".format(it.entryScore)} $${it.entryPrice}" }
             btnExport.setOnClickListener {
@@ -38,8 +38,8 @@ class HistoryActivity : AppCompatActivity() {
                     val csv = withContext(Dispatchers.IO){
                         val sb = StringBuilder("type,module,moduleId,amountSOL,scoreAtTrade,pnlPct,pnlUsd,solPrice,timestamp,txSig\n")
                         history.forEach{
-                            val pnlUsd = it.pnlPct/100*it.amountSol*PerformanceService.lastSolPrice
-                            sb.append("${it.type},${it.moduleName},${it.moduleId},${it.amountSol},${it.scoreAtTrade},${it.pnlPct},${pnlUsd},${PerformanceService.lastSolPrice},${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(it.timestamp))},${it.txSig}\n")
+                            val pnlUsd = it.pnlPct/100*it.amountSOL*PerformanceService.lastSolPrice
+                            sb.append("${it.type},${it.moduleName},${it.moduleId},${it.amountSOL},${it.scoreAtTrade},${it.pnlPct},${pnlUsd},${PerformanceService.lastSolPrice},${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date(it.timestamp))},${it.txSig}\n")
                         }; sb.toString()
                     }
                     val file = java.io.File(getExternalFilesDir(null),"shiv_trades_${System.currentTimeMillis()}.csv")
@@ -52,7 +52,7 @@ class HistoryActivity : AppCompatActivity() {
             }
             for(h in history.take(100)){
                 val color = if(h.type=="BUY") 0xFF00FF88.toInt() else if(h.pnlPct>0) 0xFF00FF88.toInt() else 0xFFFF3344.toInt()
-                val usd = h.pnlPct/100*h.amountSol*PerformanceService.lastSolPrice
+                val usd = h.pnlPct/100*h.amountSOL*PerformanceService.lastSolPrice
                 val tv = TextView(this@HistoryActivity).apply { text="${h.type} ${h.moduleName} | ${"%.2f".format(h.pnlPct)}% ($${"%.2f".format(usd)}) | ${SimpleDateFormat("MM-dd HH:mm", Locale.US).format(Date(h.timestamp))}"; setTextColor(color); textSize=11f; setPadding(0,6,0,6) }
                 list.addView(tv)
             }

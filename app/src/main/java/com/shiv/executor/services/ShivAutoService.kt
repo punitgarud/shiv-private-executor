@@ -55,7 +55,7 @@ class ShivAutoService : Service() {
                                 val q = JupiterService.getBestQuote((amountSOL*1e9).toLong(), slippagePct*100)
                                 if(q==null || JupiterService.lastImpact > mevImpactLimit) continue
                                 db.positionDao().insert(PositionEntity(moduleId=m.id, moduleName=m.name, entryScore=m.score, amountSOL=amountSOL, entryPrice=m.entryPrice, mint=m.mint, timestamp=System.currentTimeMillis()))
-                                db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="BUY", action="BUY", amountSOL=amountSOL, amountSol=amountSOL, scoreAtTrade=m.score, timestamp=System.currentTimeMillis()))
+                                db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="BUY", action="BUY", amountSOL=amountSOL, amountSOL=amountSOL, scoreAtTrade=m.score, timestamp=System.currentTimeMillis()))
                             }
                             "SELL" -> {
                                 val pos = openPositions[m.id] ?: continue
@@ -64,7 +64,7 @@ class ShivAutoService : Service() {
                                     val q = JupiterService.getBestQuoteReverse((amountSOL*1e9).toLong(), slippagePct*100)
                                     if(q==null || JupiterService.lastImpact > mevImpactLimit) continue
                                     db.positionDao().delete(m.id)
-                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", action="SELL", amountSOL=amountSOL, amountSol=amountSOL, scoreAtTrade=m.score, pnlPct=pnl, pnl=pnl, timestamp=System.currentTimeMillis()))
+                                    db.positionDao().insertHistory(TradeHistoryEntity(moduleId=m.id, moduleName=m.name, type="SELL", action="SELL", amountSOL=amountSOL, amountSOL=amountSOL, scoreAtTrade=m.score, pnlPct=pnl, pnl=pnl, timestamp=System.currentTimeMillis()))
                                 }
                             }
                         }
