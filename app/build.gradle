@@ -1,42 +1,46 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 android {
     namespace 'com.shiv.executor'
     compileSdk 34
     defaultConfig {
         applicationId "com.shiv.executor"
-        minSdk 24
+        minSdk 26
         targetSdk 34
-        versionCode 6
-        versionName "4.1"
+        versionCode 107
+        versionName "4.1-room-fix"
     }
     signingConfigs {
-        debug {
-            v1SigningEnabled true
-            v2SigningEnabled true
-        }
+        debug { v1SigningEnabled true; v2SigningEnabled true }
     }
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-            minifyEnabled false
-        }
+        debug { minifyEnabled false; signingConfig signingConfigs.debug }
+        release { minifyEnabled false }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions { jvmTarget = '17' }
 }
 dependencies {
+    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.activity:activity:1.8.2'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
+    implementation 'androidx.lifecycle:lifecycle-service:2.7.0'
+    implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+    kapt 'androidx.room:room-compiler:2.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'org.json:json:20231013'
-    implementation 'androidx.lifecycle:lifecycle-service:2.7.0'
+    implementation 'com.solanamobile:mobile-wallet-adapter-clientlib:2.0.4'
+    implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.4'
 }
