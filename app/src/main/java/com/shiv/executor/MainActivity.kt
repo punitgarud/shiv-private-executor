@@ -7,7 +7,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import com.shiv.executor.services.HotWalletManager
 import com.shiv.executor.services.ShivAutoService
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,16 +23,14 @@ class MainActivity : AppCompatActivity() {
         btnStart.setOnClickListener{
             val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this), object:BiometricPrompt.AuthenticationCallback(){
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult){ super.onAuthenticationSucceeded(result)
-                    val svc = Intent(this@MainActivity, ShivAutoService::class.java); ContextCompat.startForegroundService(this@MainActivity, svc); Toast.makeText(this@MainActivity,"V4 Risk Protected Started",Toast.LENGTH_LONG).show()
+                    val svc = Intent(this@MainActivity, ShivAutoService::class.java); ContextCompat.startForegroundService(this@MainActivity, svc); Toast.makeText(this@MainActivity,"V4 Started",Toast.LENGTH_LONG).show()
                 }
             })
-            prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle("Unlock SHIV").setSubtitle("Start trading with biometric").setNegativeButtonText("Cancel").build())
+            prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle("Unlock SHIV").setSubtitle("Start trading").setNegativeButtonText("Cancel").build())
         }
         if(intent.getStringExtra("action")=="refill"){
             val amt = intent.getDoubleExtra("amount",0.5)
-            AlertDialog.Builder(this).setTitle("Refill Hot Wallet?").setMessage("Low balance detected (<0.05 SOL).\nRefill $amt SOL from Seed Vault now?\n\nTrading is paused until refilled.").setPositiveButton("Refill $amt SOL"){_,_->
-                Toast.makeText(this,"Refilling $amt SOL - implement Seed Vault transfer here",Toast.LENGTH_LONG).show()
-            }.setNegativeButton("Later",null).show()
+            AlertDialog.Builder(this).setTitle("Refill Hot Wallet?").setMessage("Low balance <0.05 SOL.\nRefill $amt SOL?").setPositiveButton("Refill"){_,_-> Toast.makeText(this,"Refill $amt - impl Seed Vault",Toast.LENGTH_LONG).show() }.setNegativeButton("Later",null).show()
         }
         setContentView(layout)
     }
