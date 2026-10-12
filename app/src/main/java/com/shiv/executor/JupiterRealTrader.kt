@@ -30,10 +30,10 @@ object JupiterRealTrader {
             val quoteReq = Request.Builder().url(quoteUrl).build()
             val quoteRes = client.newCall(quoteReq).execute()
             val quoteBody = quoteRes.body?.string()?: return@withContext false
-            if (quoteBody.contains("error")) { android.util.Log.e("SHIV", "Quote: $quoteBody"); return@withContext false }
+            if (quoteBody.contains("error")) { android.util.Log.e("SHIV", "Quote err: $quoteBody"); return@withContext false }
             val quoteJson = JSONObject(quoteBody)
-            val pubkey = try { com.shiv.executor.services.HotWalletManager.getPublicKey() } catch(e:Exception){ "" }
-            if (pubkey.isEmpty()) { android.util.Log.e("SHIV","No pubkey"); return@withContext false }
+            val pubkey = com.shiv.executor.services.HotWalletManager.getHotWalletPubkey(context)?: ""
+            if (pubkey.isEmpty()) { android.util.Log.e("SHIV","No hot_pubkey"); return@withContext false }
             val swapBody = JSONObject()
             swapBody.put("quoteResponse", quoteJson)
             swapBody.put("userPublicKey", pubkey)
@@ -43,14 +43,15 @@ object JupiterRealTrader {
             val swapResult = swapRes.body?.string()?: return@withContext false
             val swapJson = JSONObject(swapResult)
             val txBase64 = swapJson.optString("swapTransaction", "")
-            if (txBase64.isEmpty()) { android.util.Log.e("SHIV","No tx: $swapResult"); return@withContext false }
+            if (txBase64.isEmpty()) { android.util.Log.e("SHIV","No swapTransaction: $swapResult"); return@withContext false }
             withContext(Dispatchers.Main) {
-                val intent = android.content.Intent().apply { action = "com.solana.mobilewalletadapter.action.SIGN_AND_SEND"; putExtra("transaction", txBase64) }
-                try { context.startActivity(intent) } catch (e: Exception) { android.util.Log.d("SHIV_REAL", "TX: $txBase64") }
+                val intent = android.content.Intent().apply {
+                    action = "com.solana.mobilewalletadapter.action.SIGN_AND_SEND"
+                    putExtra("transaction", txBase64)
+                }
+                try { context.startActivity(intent) } catch (e: Exception) { android.util.Log.e("SHIV","MWA intent fail", e) }
             }
             true
-        } catch (e: Exception) {
-            android.util.Log.e("SHIV","executeReal", e); false
-        }
+        } catch (e: Exception) { android.util.Log.e("SHIV","executeReal crash", e); false }
     }
 }
