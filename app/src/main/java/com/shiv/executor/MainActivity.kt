@@ -11,6 +11,7 @@ import com.shiv.executor.services.HotWalletManager
 import com.shiv.executor.services.ShivAutoService
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        try { CrashHandler.init() } catch(_:Exception){}
         super.onCreate(savedInstanceState)
         val layout = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(0xFF000000.toInt()); setPadding(40,100,40,40) }
         val title = TextView(this).apply { text="SHIV PRIVATE EXECUTOR V4\nRisk Protected\n"; setTextColor(Color.WHITE); textSize=20f }; layout.addView(title)

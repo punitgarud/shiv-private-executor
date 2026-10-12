@@ -1,0 +1,139 @@
+--------- beginning of main
+10-12 09:26:18.821 29756 15795 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:26:18.823 29756 15795 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.buffercount.trace"
+10-12 09:26:18.823 29756 15795 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:26:18.823 29756 15795 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.buffercount.trace"
+10-12 09:26:18.823 29756 15795 W libc    : Access denied finding property "persist.vendor.media.playback.mbrain.MtkVideoInfo"
+10-12 09:26:18.823 29756 15795 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:26:18.826 29756 15797 I CCodec  : setting up 'default' as default (vendor) store
+10-12 09:26:18.829 29756 15797 I CCodec  : Created component [c2.android.vorbis.decoder] for [c2.android.vorbis.decoder]
+10-12 09:26:18.836 29756 15797 I CCodecConfig: query failed after returning 8 values (BAD_INDEX)
+10-12 09:26:18.840 29756 15795 E MediaCodec: Media Quality Service not found.
+10-12 09:26:18.842 29756 15797 W Codec2Client: query -- param skipped: index = 1107298332.
+10-12 09:26:18.842 29756 15797 I CCodecConfig: query failed after returning 8 values (BAD_INDEX)
+10-12 09:26:18.842 29756 15797 E com.termux: Failed to query component interface for required system resources: 6
+10-12 09:26:18.842 29756 15797 W Codec2Client: query -- param skipped: index = 1342179345.
+10-12 09:26:18.842 29756 15797 W Codec2Client: query -- param skipped: index = 2415921170.
+10-12 09:26:18.844 29756 15797 I CCodecBufferChannel: [c2.android.vorbis.decoder#232] Created output block pool with allocatorID 16 => poolID 1382 - OK
+10-12 09:26:18.864 29756 15797 I hw-BpHwBinder: onLastStrongRef automatically unlinking death recipients
+10-12 09:26:18.867 29756 29756 E ImeBackDispatcher: Ime callback not found. Ignoring unregisterReceivedCallback. callbackId: 117686380
+10-12 09:26:18.870 29756 29756 I ImeTracker: com.termux:c107c978: onCancelled at PHASE_CLIENT_REPORT_REQUESTED_VISIBLE_TYPES
+10-12 09:26:18.950 29756 29756 I ImeTracker: system_server:92bd4d7a: onShown
+10-12 09:26:19.112 29756 29756 I ImeTracker: com.termux:96e85258: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+10-12 09:26:19.112 29756 29756 I ImeTracker: com.termux:96e85258: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+10-12 09:26:21.619 15813 15813 W apt     : type=1400 audit(0.0:69921): avc:  granted  { execute } for  name="http" dev="dm-61" ino=848921 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:21.619 15813 15813 W apt     : type=1400 audit(0.0:69922): avc:  granted  { execute } for  name="http" dev="dm-61" ino=848921 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:21.619 15813 15813 W apt     : type=1400 audit(0.0:69923): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/lib/apt/methods/http" dev="dm-61" ino=848921 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:21.623 15813 15813 W https   : type=1400 audit(0.0:69924): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/lib/apt/methods/http" dev="dm-61" ino=848921 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:21.635 15813 15813 W https   : type=1400 audit(0.0:69925): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+10-12 09:26:21.635 15813 15813 W https   : type=1400 audit(0.0:69926): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+10-12 09:26:24.758 29756 29756 I ImeTracker: system_server:349cb96d: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+10-12 09:26:28.219 15823 15823 W apt     : type=1400 audit(0.0:69949): avc:  granted  { execute } for  name="dpkg" dev="dm-61" ino=846155 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:28.219 15823 15823 W apt     : type=1400 audit(0.0:69950): avc:  granted  { execute } for  name="dpkg" dev="dm-61" ino=846155 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:28.219 15823 15823 W apt     : type=1400 audit(0.0:69951): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/bin/dpkg" dev="dm-61" ino=846155 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:28.223 15823 15823 W dpkg    : type=1400 audit(0.0:69952): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/bin/dpkg" dev="dm-61" ino=846155 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:28.227 15823 15823 W dpkg    : type=1400 audit(0.0:69953): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+10-12 09:26:29.379 15869 15869 W dpkg    : type=1400 audit(0.0:70306): avc:  granted  { execute } for  name="coreutils" dev="dm-61" ino=848919 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:29.379 15869 15869 W dpkg    : type=1400 audit(0.0:70307): avc:  granted  { execute } for  name="coreutils" dev="dm-61" ino=848919 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:29.379 15869 15869 W dpkg    : type=1400 audit(0.0:70308): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/bin/coreutils" dev="dm-61" ino=848919 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:29.383 15869 15869 W rm      : type=1400 audit(0.0:70309): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/bin/coreutils" dev="dm-61" ino=848919 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:29.383 15869 15869 W rm      : type=1400 audit(0.0:70310): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+--------- beginning of crash
+10-12 09:26:29.948 15888 15888 F linker  : CANNOT LINK EXECUTABLE "/data/data/com.termux/files/usr/bin/adb": cannot locate symbol "_ZNSt6__ndk113__hash_memoryEPKvm" referenced by "/data/data/com.termux/files/usr/bin/adb"...
+10-12 09:26:31.092 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ImeBackAnimationController@ddcbf81
+10-12 09:26:31.105 29756 29756 I ImeTracker: system_server:f7a1e8b9: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+10-12 09:26:36.098 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.098 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.098 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.098 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.148 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.148 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.148 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:36.148 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:37.760 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@ad3dd42
+10-12 09:26:37.766 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@a371b45
+10-12 09:26:37.775 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@dfe39bb
+10-12 09:26:41.071 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.071 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.071 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.071 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.141 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.141 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.141 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.141 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.144 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.144 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.144 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.144 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:41.994 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@b9c1505
+10-12 09:26:41.999 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@4936b14
+10-12 09:26:42.033 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@d4f4362
+10-12 09:26:42.983 15908 15908 W bash    : type=1400 audit(0.0:70498): avc:  granted  { execute } for  name="adb" dev="dm-61" ino=841332 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:42.983 15908 15908 W bash    : type=1400 audit(0.0:70499): avc:  granted  { execute } for  name="adb" dev="dm-61" ino=841332 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:42.983 15908 15908 W bash    : type=1400 audit(0.0:70500): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/bin/adb" dev="dm-61" ino=841332 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:42.983 15908 15908 W adb     : type=1400 audit(0.0:70501): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/bin/adb" dev="dm-61" ino=841332 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:42.983 15909 15909 W bash    : type=1400 audit(0.0:70502): avc:  granted  { execute } for  name="grep" dev="dm-61" ino=516202 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:26:43.003 15908 15908 F linker  : CANNOT LINK EXECUTABLE "adb": cannot locate symbol "_ZNSt6__ndk113__hash_memoryEPKvm" referenced by "/data/data/com.termux/files/usr/bin/adb"...
+10-12 09:26:47.184 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.184 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.184 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.184 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.184 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@33453ed
+10-12 09:26:47.200 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.200 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.200 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.200 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:26:47.952 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@9a73015
+10-12 09:26:48.965 29756 29756 I ScrollIdentify: on fling
+10-12 09:26:50.967 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@b174c3
+10-12 09:26:50.974 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@85ee3ca
+10-12 09:26:50.980 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@32319e8
+10-12 09:26:51.760 29756 29756 I ImeTracker: system_server:1ecd7e75: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+10-12 09:26:52.341 29756 29756 I ImeTracker: system_server:dbae64c9: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+10-12 09:26:52.375 29756 29762 W com.termux: Reducing the number of considered missed Gc histogram windows from 284 to 100
+10-12 09:26:52.378 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ImeBackAnimationController@ddcbf81
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.buffercount.trace"
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.buffercount.trace"
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.playback.mbrain.MtkVideoInfo"
+10-12 09:27:08.579 29756 15979 W libc    : Access denied finding property "persist.vendor.media.c2.frameworks.debug.log"
+10-12 09:27:08.584 29756 15981 I CCodec  : setting up 'default' as default (vendor) store
+10-12 09:27:08.590 29756 15981 I CCodec  : Created component [c2.android.vorbis.decoder] for [c2.android.vorbis.decoder]
+10-12 09:27:08.594 29756 15981 I CCodecConfig: query failed after returning 8 values (BAD_INDEX)
+10-12 09:27:08.597 29756 15979 E MediaCodec: Media Quality Service not found.
+10-12 09:27:08.598 29756 15981 W Codec2Client: query -- param skipped: index = 1107298332.
+10-12 09:27:08.598 29756 15981 I CCodecConfig: query failed after returning 8 values (BAD_INDEX)
+10-12 09:27:08.598 29756 15981 E com.termux: Failed to query component interface for required system resources: 6
+10-12 09:27:08.599 29756 15981 W Codec2Client: query -- param skipped: index = 1342179345.
+10-12 09:27:08.599 29756 15981 W Codec2Client: query -- param skipped: index = 2415921170.
+10-12 09:27:08.605 29756 15981 I CCodecBufferChannel: [c2.android.vorbis.decoder#463] Created output block pool with allocatorID 16 => poolID 1388 - OK
+10-12 09:27:08.617 29756 29756 E ImeBackDispatcher: Ime callback not found. Ignoring unregisterReceivedCallback. callbackId: 9272067
+10-12 09:27:08.625 29756 29756 I ImeTracker: com.termux:ab9cfcae: onCancelled at PHASE_CLIENT_REPORT_REQUESTED_VISIBLE_TYPES
+10-12 09:27:08.627 29756 15981 I hw-BpHwBinder: onLastStrongRef automatically unlinking death recipients
+10-12 09:27:08.671 29756 29756 I ImeTracker: system_server:aa27a413: onShown
+10-12 09:27:08.873 29756 29756 I ImeTracker: com.termux:24f7ce6e: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+10-12 09:27:08.874 29756 29756 I ImeTracker: com.termux:24f7ce6e: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+10-12 09:27:10.995 15988 15988 W bash    : type=1400 audit(0.0:70641): avc:  granted  { execute } for  name="command-not-found" dev="dm-61" ino=849018 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:10.999 15988 15988 W bash    : type=1400 audit(0.0:70642): avc:  granted  { execute } for  name="command-not-found" dev="dm-61" ino=849018 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:10.999 15988 15988 W bash    : type=1400 audit(0.0:70643): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/libexec/termux/command-not-found" dev="dm-61" ino=849018 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:10.999 15988 15988 W command-not-fou: type=1400 audit(0.0:70644): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/libexec/termux/command-not-found" dev="dm-61" ino=849018 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:11.003 15988 15988 W command-not-fou: type=1400 audit(0.0:70645): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+10-12 09:27:15.287 15989 15989 W bash    : type=1400 audit(0.0:70651): avc:  granted  { execute } for  name="clear" dev="dm-61" ino=835329 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:15.287 15989 15989 W bash    : type=1400 audit(0.0:70652): avc:  granted  { execute } for  name="clear" dev="dm-61" ino=835329 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:15.287 15989 15989 W bash    : type=1400 audit(0.0:70653): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/bin/clear" dev="dm-61" ino=835329 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:15.287 15989 15989 W clear   : type=1400 audit(0.0:70654): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/bin/clear" dev="dm-61" ino=835329 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:15.291 15989 15989 W clear   : type=1400 audit(0.0:70655): avc:  denied  { search } for  name="tests" dev="dm-61" ino=111 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:shell_test_data_file:s0 tclass=dir permissive=0 app=com.termux
+10-12 09:27:16.359 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:27:16.359 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:27:16.360 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:27:16.360 29756 29756 E ViewDragHelper: Ignoring pointerId=0 because ACTION_DOWN was not received for this pointer before ACTION_MOVE. It likely happened because  ViewDragHelper did not receive all the events in the event stream.
+10-12 09:27:16.362 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@a82a2a
+10-12 09:27:17.146 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@7d78a88
+10-12 09:27:17.151 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@df52fa3
+10-12 09:27:17.160 29756 29756 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda12@5a26232
+10-12 09:27:17.915 16006 16006 W bash    : type=1400 audit(0.0:70661): avc:  granted  { execute } for  name="grep" dev="dm-61" ino=516202 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:17.915 16006 16006 W bash    : type=1400 audit(0.0:70662): avc:  granted  { execute } for  name="grep" dev="dm-61" ino=516202 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:17.915 16006 16006 W bash    : type=1400 audit(0.0:70663): avc:  granted  { execute_no_trans } for  path="/data/data/com.termux/files/usr/bin/grep" dev="dm-61" ino=516202 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:17.915 16007 16007 W bash    : type=1400 audit(0.0:70664): avc:  granted  { execute } for  name="coreutils" dev="dm-61" ino=848919 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
+10-12 09:27:17.915 16006 16006 W grep    : type=1400 audit(0.0:70665): avc:  granted  { execute } for  path="/data/data/com.termux/files/usr/bin/grep" dev="dm-61" ino=516202 scontext=u:r:untrusted_app_27:s0:c40,c258,c512,c768 tcontext=u:object_r:app_data_file:s0:c40,c258,c512,c768 tclass=file app=com.termux
