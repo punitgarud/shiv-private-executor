@@ -4,10 +4,7 @@ object CrashHandler {
     fun init() {
         val old = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
-            try {
-                Log.e("SHIV_CRASH", "Crash in ${t.name}: ${e.message}", e)
-                e.printStackTrace()
-            } catch(_:Exception){}
+            try { Log.e("SHIV_CRASH", "Crash in ${t.name}: ${e.message}", e) } catch(_:Exception){}
             old?.uncaughtException(t, e)
         }
     }
