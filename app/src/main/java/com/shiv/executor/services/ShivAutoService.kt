@@ -34,7 +34,6 @@ class ShivAutoService : Service() {
         super.onCreate()
         createChannel()
         StatusManager.setServiceRunning(this, true)
-        StatusManager.appendLog(this, "V4.3 Persistent Service Created")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,9 +45,16 @@ class ShivAutoService : Service() {
             return START_NOT_STICKY
         }
 
+        // MUST call startForeground immediately - before 5 sec
+        try {
+            val notif = buildNotification("Balance: ${"%.4f".format(balance)} SOL | Guard ON", "Top4: Scanning Jupiter | Tap to open")
+            startForeground(1, notif)
+        } catch(e:Exception) {
+            android.util.Log.e("SHIV", "startForeground fail ${e.message}")
+        }
+
         StatusManager.setServiceRunning(this, true)
-        StatusManager.appendLog(this, "V4.3 Service Start - Persistent LOCKED")
-        startForeground(1, buildNotification("Balance: ${"%.4f".format(balance)} SOL", "Guard ON | Scanning Jupiter"))
+        StatusManager.appendLog(this, "V4.3.1 Service STARTED - Notification HIGH")
         handler.post(updateRunnable)
         return START_STICKY
     }
@@ -61,11 +67,15 @@ class ShivAutoService : Service() {
 
     private fun createChannel() {
         try {
-            val channel = NotificationChannel("shiv_persistent", "SHIV V4 LIVE", NotificationManager.IMPORTANCE_LOW).apply {
+            // CHANGE: IMPORTANCE_HIGH - will show in panel
+            val channel = NotificationChannel("shiv_persistent", "SHIV V4 LIVE", NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "SHIV Executor is running - Risk Protected"
-                setShowBadge(false)
+                setShowBadge(true)
+                enableVibration(false)
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             }
-            getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
+            val nm = getSystemService(NotificationManager::class.java)
+            nm?.createNotificationChannel(channel)
         } catch(_:Exception){}
     }
 
@@ -87,15 +97,16 @@ class ShivAutoService : Service() {
         val historyPending = PendingIntent.getActivity(this, 2, historyIntent, PendingIntent.FLAG_IMMUTABLE)
 
         return Notification.Builder(this, "shiv_persistent")
-          .setContentTitle("SHIV v4.3 LIVE - $title")
-          .setContentText(text)
-          .setSmallIcon(android.R.drawable.ic_lock_lock)
-          .setOngoing(true)
-          .setOnlyAlertOnce(true)
-          .setContentIntent(mainPending)
-          .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_view, "HISTORY", historyPending).build())
-          .addAction(Notification.Action.Builder(android.R.drawable.ic_delete, "STOP", stopPending).build())
-          .setStyle(Notification.BigTextStyle().bigText("$text\nLoss:-0.05 MEV:1% Sharpe>1.5\nTap to open"))
-          .build()
+         .setContentTitle("SHIV v4.3.1 LIVE - $title")
+         .setContentText(text)
+         .setSmallIcon(android.R.drawable.ic_dialog_info) // visible icon
+         .setOngoing(true)
+         .setOnlyAlertOnce(true)
+         .setVisibility(Notification.VISIBILITY_PUBLIC)
+         .setContentIntent(mainPending)
+         .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_view, "HISTORY", historyPending).build())
+         .addAction(Notification.Action.Builder(android.R.drawable.ic_delete, "STOP", stopPending).build())
+         .setStyle(Notification.BigTextStyle().bigText("$text\nLoss:-0.05 MEV:1% Sharpe>1.5\nPersistent Locked"))
+         .build()
     }
 }

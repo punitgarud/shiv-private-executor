@@ -1,7 +1,10 @@
 package com.shiv.executor
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.shiv.executor.services.ShivAutoService
 
@@ -23,11 +27,11 @@ class MainActivity : AppCompatActivity() {
         override fun run() {
             try {
                 val running = StatusManager.isServiceRunning(this@MainActivity)
-                tvStatus.text = "Status: ${if(running) "● RUNNING - Persistent Locked" else "○ IDLE"} | ${if(running) "Notification Active" else "Tap START"}"
+                tvStatus.text = "Status: ${if(running) "● RUNNING - Persistent Locked" else "○ IDLE"} | ${if(running) "Notification SHOULD be visible" else "Tap START"}"
                 tvStatus.setTextColor(if(running) Color.parseColor("#00FF88") else Color.GRAY)
                 tvBal.text = StatusManager.getBalanceText(this@MainActivity)
                 tvTop4.text = StatusManager.getTop4(this@MainActivity)
-                tvLog.text = StatusManager.getLogs(this@MainActivity).takeLast(2000)
+                tvLog.text = StatusManager.getLogs(this@MainActivity).takeLast(3000)
             } catch(_:Exception){}
             handler.postDelayed(this, 2000)
         }
@@ -35,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkNotificationPermission()
+
         val lay = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(40,100,40,40)
@@ -46,14 +52,18 @@ class MainActivity : AppCompatActivity() {
         tvLog = TextView(this).apply { setTextColor(Color.LTGRAY); textSize = 12f }
         val btnStart = Button(this).apply { text = "START EXECUTOR (PERSISTENT)" }
         val btnStop = Button(this).apply { text = "STOP" }
+        val btnPerm = Button(this).apply { text = "ENABLE NOTIFICATIONS"; setBackgroundColor(Color.parseColor("#FF8800")) }
+
+        btnPerm.setOnClickListener { checkNotificationPermission(true) }
 
         btnStart.setOnClickListener {
+            checkNotificationPermission(true)
             try {
                 val i = Intent(this, ShivAutoService::class.java)
                 ContextCompat.startForegroundService(this, i)
                 StatusManager.setServiceRunning(this, true)
-                StatusManager.appendLog(this, "MainActivity: Start clicked - persistent")
-                Toast.makeText(this, "V4.3 Persistent Started - check notification panel", Toast.LENGTH_LONG).show()
+                StatusManager.appendLog(this, "Start clicked - HIGH channel")
+                Toast.makeText(this, "V4.3.1 Started - PULL DOWN notification panel now", Toast.LENGTH_LONG).show()
             } catch(e:Exception){ Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_LONG).show() }
         }
         btnStop.setOnClickListener {
@@ -64,10 +74,21 @@ class MainActivity : AppCompatActivity() {
         lay.addView(tvStatus)
         lay.addView(tvBal)
         lay.addView(tvTop4)
+        lay.addView(btnPerm)
         lay.addView(btnStart)
         lay.addView(btnStop)
         lay.addView(tvLog)
         setContentView(lay)
+    }
+
+    private fun checkNotificationPermission(force: Boolean = false) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)!= PackageManager.PERMISSION_GRANTED) {
+                if (force ||!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+                }
+            }
+        }
     }
 
     override fun onResume() { super.onResume(); handler.post(refresh) }
