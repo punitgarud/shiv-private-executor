@@ -32,6 +32,8 @@ class ShivAutoService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        com.shiv.executor.StatusManager.setRunning(this,true)
+        super.onCreate()
         createChannel()
         StatusManager.setServiceRunning(this, true)
     }
@@ -60,6 +62,10 @@ class ShivAutoService : Service() {
     }
 
     override fun onDestroy() {
+        com.shiv.executor.StatusManager.setRunning(this,false)
+        super.onDestroy()
+        }
+    override fun onCreate()
         handler.removeCallbacks(updateRunnable)
         StatusManager.setServiceRunning(this, false)
         super.onDestroy()
