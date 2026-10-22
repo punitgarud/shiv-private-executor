@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android' version '1.9.22'
+    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
 android {
@@ -10,7 +10,7 @@ android {
         applicationId "com.shiv.executor"
         minSdk 26
         targetSdk 34
-        versionCode 130
+        versionCode 132
         versionName "v29-12-modules-final"
     }
     buildTypes {
@@ -33,5 +33,5 @@ dependencies {
     kapt 'androidx.room:room-compiler:2.6.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-    implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.1'
+    implementation 'com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.1.0'
 }
