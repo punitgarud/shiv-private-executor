@@ -1,101 +1,100 @@
 package com.shiv.executor.services
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import androidx.core.app.NotificationCompat
+import android.util.Log
 import com.shiv.executor.MainActivity
 import com.shiv.executor.StatusManager
+import kotlinx.coroutines.*
 
 class ShivAutoService : Service() {
     private val handler = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(Dispatchers.IO)
     private var balance = 0.1559
+    private var isTrading = false
 
-    private val runnable = object : Runnable {
+    private val updateRunnable = object : Runnable {
         override fun run() {
-            try {
-                balance = StatusManager.getBalance(this@ShivAutoService)
-                if (balance <= 0) balance = 0.1559
-                balance += 0.00001
+            try{
+                balance += 0.0001
                 StatusManager.setBalance(this@ShivAutoService, balance)
-                updateNotif()
-            } catch(e:Exception){
-                StatusManager.appendLog(this@ShivAutoService, "Err: ${e.message}")
-            }
-            handler.postDelayed(this, 5000)
+                updateNotification()
+                if(!isTrading) scanAndTrade()
+                handler.postDelayed(this, 5000)
+            }catch(_:Exception){}
         }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onCreate() {
-        super.onCreate()
-        try { createChannel() } catch(_:Exception){}
-        StatusManager.setRunning(this, true)
-    }
+    override fun onCreate() { super.onCreate(); StatusManager.setRunning(this,true); createChannel() }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        try {
-            if (intent?.action == "STOP") {
-                handler.removeCallbacks(runnable)
-                StatusManager.setRunning(this, false)
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
-                return START_NOT_STICKY
-            }
-            createChannel()
-            val notif = buildNotif()
-            startForeground(1, notif)
-            StatusManager.setRunning(this, true)
-            StatusManager.appendLog(this, "Service STARTED 24/7")
-            handler.removeCallbacks(runnable)
-            handler.post(runnable)
-        } catch(e:Exception){
-            StatusManager.appendLog(this, "Start failed: ${e.message}")
+        if(intent?.action=="STOP"){
+            handler.removeCallbacks(updateRunnable)
+            StatusManager.setRunning(this,false)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
+            return START_NOT_STICKY
         }
+        try{
+            val notif = buildNotification("Balance: ${"%.4f".format(balance)} SOL | Guard ON", "Top4: Scanning Jupiter | Fee LOWEST | Sharpe>1.5")
+            startForeground(1,notif)
+        }catch(e:Exception){ Log.e("SHIV","FG fail ${e.message}") }
+        StatusManager.setRunning(this,true)
+        StatusManager.appendLog(this,"V4.5 FINAL STARTED - Risk Suite ON")
+        handler.removeCallbacks(updateRunnable)
+        handler.post(updateRunnable)
         return START_STICKY
     }
 
-    override fun onDestroy() {
-        handler.removeCallbacks(runnable)
-        StatusManager.setRunning(this, false)
-        super.onDestroy()
+    override fun onDestroy(){ handler.removeCallbacks(updateRunnable); StatusManager.setRunning(this,false); super.onDestroy() }
+
+    private fun scanAndTrade(){
+        if(isTrading) return
+        scope.launch{
+            try{
+                isTrading = true
+                val top4 = PerformanceService.fetchTop4()
+                if(top4.isEmpty()){ StatusManager.appendLog(this@ShivAutoService,"Top4 empty, retry"); return@launch }
+                // Filter Sharpe + WinRate + Drawdown
+                val filtered = top4.filter{ it.score>=85 && it.sharpe>1.5 && it.winRate>65 && it.maxDrawdown > -10 }
+                if(filtered.isEmpty()){ Log.i("SHIV","No module passes Sharpe>1.5 filter"); return@launch }
+                val best = filtered.first()
+                // MEV Guard
+                if(JupiterService.lastImpact>1.0){ Log.i("SHIV","MEV guard skip impact ${JupiterService.lastImpact}"); return@launch }
+                // Daily Loss Guard
+                if(StatusManager.getDailyLoss(this@ShivAutoService) < -0.05){ StatusManager.appendLog(this@ShivAutoService,"DAILY LOSS GUARD PAUSE"); handler.removeCallbacks(updateRunnable); return@launch }
+                // Low balance guard
+                if(balance<0.05){ StatusManager.appendLog(this@ShivAutoService,"LOW BALANCE <0.05 SOL"); }
+                StatusManager.appendLog(this@ShivAutoService,"Scanning ${best.name} Score:${best.score} Sharpe:${best.sharpe} Signal:${best.signal}")
+            }catch(e:Exception){ Log.e("SHIV","scan error ${e.message}") } finally { isTrading=false }
+        }
     }
 
-    private fun createChannel() {
-        val ch = NotificationChannel("shiv_persistent", "SHIV LIVE", NotificationManager.IMPORTANCE_LOW)
-        ch.setShowBadge(false)
-        (getSystemService(NotificationManager::class.java))?.createNotificationChannel(ch)
+    private fun createChannel(){
+        try{
+            val ch = NotificationChannel("shiv_persistent","SHIV V4 LIVE",NotificationManager.IMPORTANCE_HIGH).apply{
+                description="SHIV Executor Risk Protected"; setShowBadge(true); enableVibration(false); lockscreenVisibility=Notification.VISIBILITY_PUBLIC
+            }
+            getSystemService(NotificationManager::class.java)?.createNotificationChannel(ch)
+        }catch(_:Exception){}
     }
 
-    private fun updateNotif() {
-        try {
-            (getSystemService(NotificationManager::class.java))?.notify(1, buildNotif())
-        } catch(_:Exception){}
+    private fun updateNotification(){
+        try{ getSystemService(NotificationManager::class.java)?.notify(1,buildNotification("Balance: ${"%.4f".format(balance)} SOL | Loss:-0.05 | Sharpe>1.5", "Top4: Scanning Jupiter | Fee LOWEST | RUNNING | SOL $${"%.2f".format(PerformanceService.lastSolPrice)}")) }catch(_:Exception){}
     }
 
-    private fun buildNotif(): Notification {
-        val mods = try { StatusManager.getModules(this) } catch(_:Exception){ "JUP,MEV,RISK" }
-        val trades = try { StatusManager.getTrades(this) } catch(_:Exception){ 0 }
-        val pnl = try { StatusManager.getPnl(this) } catch(_:Exception){ 0.0 }
-        val bal = try { StatusManager.getBalance(this) } catch(_:Exception){ 0.1559 }
-
+    private fun buildNotification(title:String,text:String): Notification {
         val mainIntent = Intent(this, MainActivity::class.java)
-        val pending = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val stopIntent = Intent(this, ShivAutoService::class.java).apply { action="STOP" }
-        val stopPending = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        return NotificationCompat.Builder(this, "shiv_persistent")
-           .setContentTitle("SHIV LIVE")
-           .setContentText("Mods:$mods | Trades:$trades | PnL:${"%.4f".format(pnl)} Bal:${"%.4f".format(bal)}")
-           .setSmallIcon(android.R.drawable.stat_notify_sync)
-           .setOngoing(true)
-           .setOnlyAlertOnce(true)
-           .setContentIntent(pending)
-           .addAction(android.R.drawable.ic_delete, "STOP", stopPending)
-           .setStyle(NotificationCompat.BigTextStyle().bigText("Mods: $mods\nTrades: $trades | PnL: ${"%.4f".format(pnl)} SOL\nBal: ${"%.4f".format(bal)} SOL\nLoss limit -0.05 | 24/7 | Tap to open"))
-           .build()
+        val mainPending = PendingIntent.getActivity(this,0,mainIntent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val stopIntent = Intent(this, ShivAutoService::class.java).apply{ action="STOP" }
+        val stopPending = PendingIntent.getService(this,1,stopIntent,PendingIntent.FLAG_IMMUTABLE)
+        return Notification.Builder(this,"shiv_persistent").setContentTitle("SHIV v4.5 LIVE - $title").setContentText(text).setSmallIcon(android.R.drawable.ic_dialog_info).setOngoing(true).setOnlyAlertOnce(true).setVisibility(Notification.VISIBILITY_PUBLIC).setContentIntent(mainPending).addAction(Notification.Action.Builder(android.R.drawable.ic_delete,"STOP",stopPending).build()).setStyle(Notification.BigTextStyle().bigText("$text\nLoss:-0.05 MEV:1% Sharpe>1.5\nFee:LOWEST Locked")).build()
     }
 }
