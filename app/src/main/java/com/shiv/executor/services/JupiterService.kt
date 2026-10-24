@@ -2,6 +2,8 @@ package com.shiv.executor.services
 import android.util.Log
 import kotlinx.coroutines.*
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -44,7 +46,7 @@ object JupiterService {
     suspend fun getSwapTransaction(quote:JSONObject, userPubkey:String): String? = withContext(Dispatchers.IO){
         try{
             val bodyJson = JSONObject().put("quoteResponse",quote).put("userPublicKey",userPubkey).put("wrapAndUnwrapSol",true).put("dynamicComputeUnitLimit",true).put("prioritizationFeeLamports",mapOf("autoMultiplier" to 1))
-            val req = Request.Builder().url("$JUPITER_QUOTE_API/swap").post(RequestBody.create(MediaType.parse("application/json"), bodyJson.toString())).build()
+            val req = Request.Builder().url("$JUPITER_QUOTE_API/swap").post(bodyJson.toString().toRequestBody("application/json".toMediaType())).build()
             val resp = client.newCall(req).execute()
             val body = resp.body?.string() ?: return@withContext null
             JSONObject(body).optString("swapTransaction")
