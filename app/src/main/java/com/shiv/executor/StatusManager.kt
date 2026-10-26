@@ -1,26 +1,31 @@
 package com.shiv.executor
 
-import android.content.Context
-import android.content.SharedPreferences
-
 object StatusManager {
-    private const val PREFS = "shiv_prefs"
-    private fun prefs(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private var balance: Double = 1.0
+    private var dailyLoss: Double = 0.0
+    private var trades: Int = 0
+    private var pnl: Double = 0.0
+    private var isRunning: Boolean = false
+    private val logs = mutableListOf<String>()
+    private var modules = mutableMapOf("JUP" to true, "FEE" to true, "RISK" to true, "SHARPE" to true)
+
+    @Synchronized fun getBalance(): Double = balance
+    @Synchronized fun setBalance(b: Double) { balance = b }
+
+    @Synchronized fun getLogs(): List<String> = logs.toList()
+    @Synchronized fun appendLog(log: String) {
+        if (logs.size > 100) logs.removeAt(0)
+        logs.add(log)
     }
-    fun getTrades(context: Context): Int = prefs(context).getInt("trades", 0)
-    fun setTrades(context: Context, v: Int) { prefs(context).edit().putInt("trades", v).apply() }
-    fun getPnl(context: Context): Double = prefs(context).getFloat("pnl", 0f).toDouble()
-    fun setPnl(context: Context, v: Double) { prefs(context).edit().putFloat("pnl", v.toFloat()).apply() }
-    fun getDailyLoss(context: Context): Double = prefs(context).getFloat("daily_loss", 0f).toDouble()
-    fun addDailyLoss(context: Context, v: Double) {
-        val cur = getDailyLoss(context)
-        prefs(context).edit().putFloat("daily_loss", (cur + v).toFloat()).apply()
-    }
-    fun appendLog(context: Context, msg: String) {
-        val cur = prefs(context).getString("logs", "") ?: ""
-        prefs(context).edit().putString("logs", cur + "\n" + msg).apply()
-    }
-    fun getLogs(context: Context): String = prefs(context).getString("logs", "") ?: ""
-    fun setStatus(context: Context, s: String) { prefs(context).edit().putString("status", s).apply() }
+
+    @Synchronized fun getModules(): Map<String, Boolean> = modules.toMap()
+    @Synchronized fun setModules(m: Map<String, Boolean>) { modules.clear(); modules.putAll(m) }
+
+    @Synchronized fun getDailyLoss(): Double = dailyLoss
+    @Synchronized fun addDailyLoss(amount: Double) { dailyLoss += amount }
+    @Synchronized fun setDailyLoss(loss: Double) { dailyLoss = loss }
+
+    @Synchronized fun setTrades(t: Int) { trades = t }
+    @Synchronized fun setPnl(p: Double) { pnl = p }
+    @Synchronized fun setRunning(r: Boolean) { isRunning = r }
 }
