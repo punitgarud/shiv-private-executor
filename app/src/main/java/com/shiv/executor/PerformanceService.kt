@@ -25,6 +25,7 @@ object PerformanceService {
         try {
             val response = URL(DATA_URL).readText()
             val json = JSONObject(response)
+            StatusManager.setLastSolPrice(json.optDouble("solPriceUsd", 150.0))
             val top4Array = json.getJSONArray("top4")
             val list = mutableListOf<TopToken>()
             for (i in 0 until top4Array.length()) {

@@ -5,7 +5,7 @@ object StatusManager {
     private var dailyLoss: Double = 0.0
     private var trades: Int = 0
     private var pnl: Double = 0.0
-    private var lastSolPrice: Double = 180.0
+    private var lastSolPrice: Double = 150.0
     private var isRunning: Boolean = false
     private val logs = mutableListOf<String>()
     private var modules = mutableMapOf("JUP" to true, "FEE" to true, "RISK" to true, "SHARPE" to true)

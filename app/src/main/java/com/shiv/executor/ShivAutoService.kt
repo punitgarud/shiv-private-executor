@@ -24,6 +24,8 @@ class ShivAutoService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        StatusManager.setRunning(true)
+        StatusManager.appendLog("Service Started")
         serviceScope.launch {
             while (isActive) {
                 try {
@@ -42,7 +44,7 @@ class ShivAutoService : Service() {
                             break
                         }
 
-                        StatusManager.appendLog("EXEC [${token.id}] score=${token.score} rug=${token.rugScore}")
+                        StatusManager.appendLog("EXEC [${token.id}] score=${token.score} rug=${token.rugScore} solPrice=${StatusManager.getLastSolPrice()}")
                         PerformanceService.recordTrade(true)
                         StatusManager.appendLog("WIN +0.00 SOL (${token.id})")
                     }
