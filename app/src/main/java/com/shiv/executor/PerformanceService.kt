@@ -20,13 +20,11 @@ data class TopToken(
 
 object PerformanceService {
     private const val DATA_URL = "https://punitgarud.github.io/Shiv/data.json"
-    var lastSolPrice: Double = 150.0
 
     suspend fun fetchTop4(): List<TopToken> = withContext(Dispatchers.IO) {
         try {
             val response = URL(DATA_URL).readText()
             val json = JSONObject(response)
-            lastSolPrice = json.optDouble("solPriceUsd", 150.0)
             val top4Array = json.getJSONArray("top4")
             val list = mutableListOf<TopToken>()
             for (i in 0 until top4Array.length()) {
@@ -63,6 +61,8 @@ object PerformanceService {
         if (!success) {
             StatusManager.addDailyLoss(0.01)
         }
+        StatusManager.setTrades(StatusManager.getTrades() + 1)
+        StatusManager.setPnl(StatusManager.getPnl() + if (success) 0.02 else -0.01)
     }
 
     fun canTrade(): Boolean {
