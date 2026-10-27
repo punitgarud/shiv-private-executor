@@ -20,49 +20,77 @@ class MainActivity : Activity() {
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.parseColor("#0A0A0A"))
-            setPadding(32, 32, 32, 32)
+            setPadding(24, 24, 24, 24)
         }
 
         // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK"
-            textSize = 24f
+            text = "⚡ SHIV v5 BLACK [SEEKER EDITION]"
+            textSize = 20f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
-            setPadding(0, 0, 0, 16)
+            setPadding(0, 0, 0, 12)
         }
         rootLayout.addView(header)
 
         // Status Card View
         statusText = TextView(this).apply {
             text = "Balance: 1.0 SOL | Daily Loss: 0.0 SOL\nCan Trade: true | Wallet: Connected"
-            textSize = 14f
-            setTextColor(Color.parseColor("#CCCCCC"))
+            textSize = 13f
+            setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
-            setPadding(24, 24, 24, 24)
+            setPadding(20, 20, 20, 20)
         }
         rootLayout.addView(statusText)
 
-        // Action Buttons Layout
-        val buttonLayout = LinearLayout(this).apply {
+        // Control Buttons Row 1
+        val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(0, 24, 0, 24)
+            setPadding(0, 16, 0, 8)
             gravity = Gravity.CENTER
         }
 
         val btnToggleService = Button(this).apply {
-            text = "Toggle Executor Service"
+            text = "Toggle Service"
+            textSize = 12f
             setBackgroundColor(Color.parseColor("#00FF66"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
                 val intent = Intent(this@MainActivity, ShivAutoService::class.java)
                 startForegroundService(intent)
-                Toast.makeText(this@MainActivity, "SHIV Service Started", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "SHIV Background Service Started", Toast.LENGTH_SHORT).show()
             }
         }
 
+        val btnManualTrade = Button(this).apply {
+            text = "Instant Swap"
+            textSize = 12f
+            setBackgroundColor(Color.parseColor("#222222"))
+            setTextColor(Color.parseColor("#00FF66"))
+            setOnClickListener {
+                scope.launch(Dispatchers.IO) {
+                    val success = JupiterRealTrader.executeSwap("So11111111111111111111111111111111111111112", 0.01)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Manual Swap Result: $success", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        buttonLayout1.addView(btnToggleService)
+        buttonLayout1.addView(btnManualTrade)
+        rootLayout.addView(buttonLayout1)
+
+        // Control Buttons Row 2
+        val buttonLayout2 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 0, 0, 16)
+            gravity = Gravity.CENTER
+        }
+
         val btnViewHistory = Button(this).apply {
-            text = "View History"
+            text = "Execution History"
+            textSize = 12f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#00FF66"))
             setOnClickListener {
@@ -70,17 +98,28 @@ class MainActivity : Activity() {
             }
         }
 
-        buttonLayout.addView(btnToggleService)
-        buttonLayout.addView(btnViewHistory)
-        rootLayout.addView(buttonLayout)
+        val btnClearLogs = Button(this).apply {
+            text = "Clear Logs"
+            textSize = 12f
+            setBackgroundColor(Color.parseColor("#222222"))
+            setTextColor(Color.parseColor("#FF5555"))
+            setOnClickListener {
+                StatusManager.getLogs().clear()
+                StatusManager.appendLog("Logs cleared by user")
+            }
+        }
+
+        buttonLayout2.addView(btnViewHistory)
+        buttonLayout2.addView(btnClearLogs)
+        rootLayout.addView(buttonLayout2)
 
         // Logs Header
         val logsHeader = TextView(this).apply {
-            text = "Live Execution Logs:"
-            textSize = 16f
+            text = "Live Execution & 40-Module Telemetry:"
+            textSize = 14f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
-            setPadding(0, 16, 0, 8)
+            setPadding(0, 8, 0, 8)
         }
         rootLayout.addView(logsHeader)
 
@@ -93,8 +132,8 @@ class MainActivity : Activity() {
         }
 
         logsText = TextView(this).apply {
-            text = "Initializing SHIV v5 BLACK Seeker dApp...\n"
-            textSize = 12f
+            text = "SHIV v5 BLACK initialized successfully.\n"
+            textSize = 11f
             setTextColor(Color.parseColor("#00FF66"))
             typeface = android.graphics.Typeface.MONOSPACE
         }
@@ -102,8 +141,6 @@ class MainActivity : Activity() {
         rootLayout.addView(scrollView)
 
         setContentView(rootLayout)
-
-        // Periodically refresh UI status and logs
         startStatusPoller()
     }
 
@@ -118,12 +155,12 @@ class MainActivity : Activity() {
 
                     statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade | Wallet: ${pubKey.take(6)}...${pubKey.takeLast(4)}"
                     
-                    val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
-                    logsText.text = logs.ifEmpty { "Scanning 40 analysis modules..." }
+                    val logs = StatusManager.getLogs().takeLast(35).joinToString("\n")
+                    logsText.text = logs.ifEmpty { "Scanning analysis modules..." }
                 } catch (e: Exception) {
-                    // Ignore transient UI refresh errors
+                    // Ignore transient UI refresh exceptions
                 }
-                delay(2000)
+                delay(1500)
             }
         }
     }
