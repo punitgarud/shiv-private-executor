@@ -1,6 +1,7 @@
 package com.shiv.executor
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -10,6 +11,7 @@ import kotlinx.coroutines.*
 
 class MainActivity : Activity() {
     private lateinit var statusText: TextView
+    private lateinit var moduleStatsText: TextView
     private lateinit var logsText: TextView
     private val scope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -20,39 +22,55 @@ class MainActivity : Activity() {
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.parseColor("#0A0A0A"))
-            setPadding(24, 24, 24, 24)
+            setPadding(20, 20, 20, 20)
         }
 
         // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER EDITION]"
-            textSize = 20f
+            text = "⚡ SHIV v5 BLACK [SEEKER DASHBOARD]"
+            textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
-            setPadding(0, 0, 0, 12)
+            setPadding(0, 0, 0, 8)
         }
         rootLayout.addView(header)
 
         // Status Card View
         statusText = TextView(this).apply {
-            text = "Balance: 1.0 SOL | Daily Loss: 0.0 SOL\nCan Trade: true | Wallet: Connected"
-            textSize = 13f
+            text = "Loading Wallet & Balance..."
+            textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
-            setPadding(20, 20, 20, 20)
+            setPadding(16, 16, 16, 16)
         }
         rootLayout.addView(statusText)
 
-        // Control Buttons Row 1
+        // Module Performance Breakdown Card
+        moduleStatsText = TextView(this).apply {
+            text = "Module PnL Performance:\nLoading..."
+            textSize = 11f
+            setTextColor(Color.parseColor("#00E5FF"))
+            setBackgroundColor(Color.parseColor("#121212"))
+            setPadding(16, 16, 16, 16)
+        }
+        val modParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        modParams.setMargins(0, 10, 0, 10)
+        moduleStatsText.layoutParams = modParams
+        rootLayout.addView(moduleStatsText)
+
+        // Control Buttons Row 1 (Service & Swap)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(0, 16, 0, 8)
             gravity = Gravity.CENTER
+            setPadding(0, 4, 0, 4)
         }
 
         val btnToggleService = Button(this).apply {
             text = "Toggle Service"
-            textSize = 12f
+            textSize = 11f
             setBackgroundColor(Color.parseColor("#00FF66"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
@@ -64,7 +82,7 @@ class MainActivity : Activity() {
 
         val btnManualTrade = Button(this).apply {
             text = "Instant Swap"
-            textSize = 12f
+            textSize = 11f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#00FF66"))
             setOnClickListener {
@@ -81,16 +99,50 @@ class MainActivity : Activity() {
         buttonLayout1.addView(btnManualTrade)
         rootLayout.addView(buttonLayout1)
 
-        // Control Buttons Row 2
+        // Control Buttons Row 2 (Fund Wallet & Withdraw)
         val buttonLayout2 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(0, 0, 0, 16)
             gravity = Gravity.CENTER
+            setPadding(0, 4, 0, 4)
+        }
+
+        val btnFundWallet = Button(this).apply {
+            text = "+ Fund Wallet"
+            textSize = 11f
+            setBackgroundColor(Color.parseColor("#222222"))
+            setTextColor(Color.parseColor("#00FF66"))
+            setOnClickListener {
+                HotWalletManager.deposit(0.5)
+                Toast.mainThread("Deposited +0.5 SOL to Hot Wallet")
+            }
+        }
+
+        val btnWithdrawWallet = Button(this).apply {
+            text = "- Withdraw"
+            textSize = 11f
+            setBackgroundColor(Color.parseColor("#222222"))
+            setTextColor(Color.parseColor("#FF5555"))
+            setOnClickListener {
+                val success = HotWalletManager.withdraw(0.1)
+                val msg = if (success) "Withdrew 0.1 SOL" else "Withdrawal failed (Insufficient funds)"
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        buttonLayout2.addView(btnFundWallet)
+        buttonLayout2.addView(btnWithdrawWallet)
+        rootLayout.addView(buttonLayout2)
+
+        // Control Buttons Row 3 (History & Clear)
+        val buttonLayout3 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(0, 4, 0, 10)
         }
 
         val btnViewHistory = Button(this).apply {
-            text = "Execution History"
-            textSize = 12f
+            text = "History"
+            textSize = 11f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#00FF66"))
             setOnClickListener {
@@ -100,7 +152,7 @@ class MainActivity : Activity() {
 
         val btnClearLogs = Button(this).apply {
             text = "Clear Logs"
-            textSize = 12f
+            textSize = 11f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#FF5555"))
             setOnClickListener {
@@ -109,17 +161,17 @@ class MainActivity : Activity() {
             }
         }
 
-        buttonLayout2.addView(btnViewHistory)
-        buttonLayout2.addView(btnClearLogs)
-        rootLayout.addView(buttonLayout2)
+        buttonLayout3.addView(btnViewHistory)
+        buttonLayout3.addView(btnClearLogs)
+        rootLayout.addView(buttonLayout3)
 
         // Logs Header
         val logsHeader = TextView(this).apply {
-            text = "Live Execution & 40-Module Telemetry:"
-            textSize = 14f
+            text = "Live Execution Telemetry:"
+            textSize = 13f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
-            setPadding(0, 8, 0, 8)
+            setPadding(0, 4, 0, 4)
         }
         rootLayout.addView(logsHeader)
 
@@ -132,8 +184,8 @@ class MainActivity : Activity() {
         }
 
         logsText = TextView(this).apply {
-            text = "SHIV v5 BLACK initialized successfully.\n"
-            textSize = 11f
+            text = "SHIV v5 BLACK initialized.\n"
+            textSize = 10f
             setTextColor(Color.parseColor("#00FF66"))
             typeface = android.graphics.Typeface.MONOSPACE
         }
@@ -155,10 +207,17 @@ class MainActivity : Activity() {
 
                     statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade | Wallet: ${pubKey.take(6)}...${pubKey.takeLast(4)}"
                     
-                    val logs = StatusManager.getLogs().takeLast(35).joinToString("\n")
+                    val modulePnl = StatusManager.getModulePnl()
+                    val statsBuilder = StringBuilder("Module PnL Performance:\n")
+                    for ((mod, pnlVal) in modulePnl) {
+                        statsBuilder.append(" • $mod: +$pnlVal SOL\n")
+                    }
+                    moduleStatsText.text = statsBuilder.toString().trim()
+
+                    val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
                     logsText.text = logs.ifEmpty { "Scanning analysis modules..." }
                 } catch (e: Exception) {
-                    // Ignore transient UI refresh exceptions
+                    // Ignore UI poll exceptions
                 }
                 delay(1500)
             }

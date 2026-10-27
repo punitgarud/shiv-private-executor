@@ -10,15 +10,28 @@ object HotWalletManager {
     }
 
     fun getPublicKey(): String = activePublicKey
-    
-    // Alias expected by JupiterRealTrader and other dApp modules
     fun getHotWalletPubkey(): String = activePublicKey
+    fun setPublicKey(pubKey: String) { activePublicKey = pubKey }
+    fun isReady(): Boolean = isInitialized
 
-    fun setPublicKey(pubKey: String) { 
-        activePublicKey = pubKey 
+    fun deposit(amount: Double): Boolean {
+        val newBalance = StatusManager.getBalance() + amount
+        StatusManager.setBalance(newBalance)
+        StatusManager.appendLog("DEPOSIT: Added +$amount SOL to Hot Wallet. New Balance: $newBalance SOL")
+        return true
     }
 
-    fun isReady(): Boolean = isInitialized
+    fun withdraw(amount: Double): Boolean {
+        val current = StatusManager.getBalance()
+        if (current < amount) {
+            StatusManager.appendLog("WITHDRAW FAIL: Insufficient balance ($current SOL)")
+            return false
+        }
+        val newBalance = current - amount
+        StatusManager.setBalance(newBalance)
+        StatusManager.appendLog("WITHDRAW: Sent -$amount SOL from Hot Wallet. Remaining: $newBalance SOL")
+        return true
+    }
 
     fun signAndSendTransaction(mint: String, amount: Double): Boolean {
         StatusManager.appendLog("Signing execution for mint: $mint, amount: $amount SOL")

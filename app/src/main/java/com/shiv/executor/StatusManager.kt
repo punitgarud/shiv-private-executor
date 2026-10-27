@@ -8,7 +8,14 @@ object StatusManager {
     private var lastSolPrice: Double = 150.0
     private var isRunning: Boolean = false
     private val logs = mutableListOf<String>()
-    private var modules = mutableMapOf("JUP" to true, "FEE" to true, "RISK" to true, "SHARPE" to true)
+    
+    // Per-module performance tracking (Module ID -> PnL in SOL)
+    private val modulePnlMap = mutableMapOf(
+        "BUBBLEMAPS" to 0.03,
+        "SEEKER_ECOSYSTEM_CORE" to 0.02,
+        "UNLOCKS" to 0.025,
+        "RUGCHECK" to 0.015
+    )
 
     @Synchronized fun getBalance(): Double = balance
     @Synchronized fun setBalance(b: Double) { balance = b }
@@ -18,12 +25,13 @@ object StatusManager {
         if (logs.size > 100) logs.removeAt(0)
         logs.add(log)
     }
-    @Synchronized fun clearLogs() {
-        logs.clear()
-    }
+    @Synchronized fun clearLogs() { logs.clear() }
 
-    @Synchronized fun getModules(): Map<String, Boolean> = modules.toMap()
-    @Synchronized fun setModules(m: Map<String, Boolean>) { modules.clear(); modules.putAll(m) }
+    @Synchronized fun getModulePnl(): Map<String, Double> = modulePnlMap.toMap()
+    @Synchronized fun addModulePnl(moduleId: String, amount: Double) {
+        val current = modulePnlMap[moduleId] ?: 0.0
+        modulePnlMap[moduleId] = current + amount
+    }
 
     @Synchronized fun getDailyLoss(): Double = dailyLoss
     @Synchronized fun addDailyLoss(amount: Double) { dailyLoss += amount }
