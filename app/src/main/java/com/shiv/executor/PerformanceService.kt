@@ -67,6 +67,7 @@ object PerformanceService {
     }
 
     fun canTrade(): Boolean {
-        return StatusManager.getDailyLoss() < 0.05
+        val maxAllowedLoss = StatusManager.getBalance() * 0.03 // Dynamic 3% Max Drawdown Circuit Breaker
+        return StatusManager.getDailyLoss() < maxAllowedLoss
     }
 }

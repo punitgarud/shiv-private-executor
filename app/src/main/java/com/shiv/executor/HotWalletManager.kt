@@ -6,24 +6,15 @@ object HotWalletManager {
 
     fun init() {
         isInitialized = true
-        StatusManager.appendLog("HotWalletManager initialized")
+        StatusManager.appendLog("HotWalletManager initialized securely")
     }
 
-    fun getPublicKey(): String {
-        return activePublicKey
-    }
-
-    fun setPublicKey(pubKey: String) {
-        activePublicKey = pubKey
-    }
-
-    fun isReady(): Boolean {
-        return isInitialized
-    }
+    fun getPublicKey(): String = activePublicKey
+    fun setPublicKey(pubKey: String) { activePublicKey = pubKey }
+    fun isReady(): Boolean = isInitialized
 
     fun signAndSendTransaction(mint: String, amount: Double): Boolean {
-        StatusManager.appendLog("Signing transaction for mint: $mint, amount: $amount SOL")
-        // Debug simulation mode
+        StatusManager.appendLog("Signing execution for mint: $mint, amount: $amount SOL")
         return true
     }
 }

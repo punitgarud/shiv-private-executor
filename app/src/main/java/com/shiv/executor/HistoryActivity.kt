@@ -18,7 +18,7 @@ class HistoryActivity : Activity() {
         }
 
         val title = TextView(this).apply {
-            text = "SHIV Execution History"
+            text = "SHIV v5 BLACK Execution History"
             textSize = 20f
             setTextColor(0xFF00FF00.toInt())
             setPadding(0, 0, 0, 16)
