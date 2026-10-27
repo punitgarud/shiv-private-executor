@@ -1,23 +1,40 @@
 package com.shiv.executor
 
+import android.content.Context
+import android.content.SharedPreferences
+
 object HotWalletManager {
     private var isInitialized: Boolean = false
     private var activePublicKey: String = "So11111111111111111111111111111111111111112"
+    private lateinit var prefs: SharedPreferences
+
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences("shiv_wallet_prefs", Context.MODE_PRIVATE)
+        activePublicKey = prefs.getString("saved_pubkey", "So11111111111111111111111111111111111111112") ?: "So11111111111111111111111111111111111111112"
+        isInitialized = true
+        StatusManager.appendLog("HotWalletManager initialized with key: ${activePublicKey.take(6)}...")
+    }
 
     fun init() {
+        // Fallback init if context is unavailable
         isInitialized = true
-        StatusManager.appendLog("HotWalletManager initialized securely")
     }
 
     fun getPublicKey(): String = activePublicKey
     fun getHotWalletPubkey(): String = activePublicKey
-    fun setPublicKey(pubKey: String) { activePublicKey = pubKey }
-    fun isReady(): Boolean = isInitialized
+    
+    fun importWallet(pubKey: String) {
+        activePublicKey = pubKey
+        if (::prefs.isInitialized) {
+            prefs.edit().putString("saved_pubkey", pubKey).apply()
+        }
+        StatusManager.appendLog("Wallet Imported: ${pubKey.take(6)}...${pubKey.takeLast(4)}")
+    }
 
     fun deposit(amount: Double): Boolean {
         val newBalance = StatusManager.getBalance() + amount
         StatusManager.setBalance(newBalance)
-        StatusManager.appendLog("DEPOSIT: Added +$amount SOL to Hot Wallet. New Balance: $newBalance SOL")
+        StatusManager.appendLog("DEPOSIT: Added +$amount SOL. New Balance: $newBalance SOL")
         return true
     }
 
@@ -29,12 +46,12 @@ object HotWalletManager {
         }
         val newBalance = current - amount
         StatusManager.setBalance(newBalance)
-        StatusManager.appendLog("WITHDRAW: Sent -$amount SOL from Hot Wallet. Remaining: $newBalance SOL")
+        StatusManager.appendLog("WITHDRAW: Sent -$amount SOL. Remaining: $newBalance SOL")
         return true
     }
 
     fun signAndSendTransaction(mint: String, amount: Double): Boolean {
-        StatusManager.appendLog("Signing execution for mint: $mint, amount: $amount SOL")
+        StatusManager.appendLog("Signing execution via Wallet [$activePublicKey] for mint: $mint")
         return true
     }
 }

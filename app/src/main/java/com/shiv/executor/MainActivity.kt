@@ -17,7 +17,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        HotWalletManager.init()
+        HotWalletManager.init(applicationContext)
 
         val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -27,7 +27,7 @@ class MainActivity : Activity() {
 
         // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER DASHBOARD]"
+            text = "⚡ SHIV v5 BLACK [SEEKER dApp]"
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
@@ -80,23 +80,18 @@ class MainActivity : Activity() {
             }
         }
 
-        val btnManualTrade = Button(this).apply {
-            text = "Instant Swap"
+        val btnConnectWallet = Button(this).apply {
+            text = "Connect Wallet"
             textSize = 11f
-            setBackgroundColor(Color.parseColor("#222222"))
-            setTextColor(Color.parseColor("#00FF66"))
+            setBackgroundColor(Color.parseColor("#00E5FF"))
+            setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                scope.launch(Dispatchers.IO) {
-                    val success = JupiterRealTrader.executeSwap("So11111111111111111111111111111111111111112", 0.01)
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "Manual Swap Result: $success", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                showWalletConnectDialog()
             }
         }
 
         buttonLayout1.addView(btnToggleService)
-        buttonLayout1.addView(btnManualTrade)
+        buttonLayout1.addView(btnConnectWallet)
         rootLayout.addView(buttonLayout1)
 
         // Control Buttons Row 2 (Fund Wallet & Withdraw)
@@ -107,18 +102,18 @@ class MainActivity : Activity() {
         }
 
         val btnFundWallet = Button(this).apply {
-            text = "+ Fund Wallet"
+            text = "+ Fund (0.5 SOL)"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#00FF66"))
             setOnClickListener {
                 HotWalletManager.deposit(0.5)
-                Toast.mainThread("Deposited +0.5 SOL to Hot Wallet")
+                Toast.makeText(this@MainActivity, "Deposited +0.5 SOL", Toast.LENGTH_SHORT).show()
             }
         }
 
         val btnWithdrawWallet = Button(this).apply {
-            text = "- Withdraw"
+            text = "- Withdraw (0.1 SOL)"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#FF5555"))
@@ -196,6 +191,30 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
+    private fun showWalletConnectDialog() {
+        val input = EditText(this).apply {
+            hint = "Enter Solana Public Key / Address"
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.GRAY)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Connect Solana Wallet")
+            .setMessage("Enter your Solana wallet address or Seeker Seed Vault pubkey:")
+            .setView(input)
+            .setPositiveButton("Connect") { _, _ ->
+                val pubKey = input.text.toString().trim()
+                if (pubKey.length > 30) {
+                    HotWalletManager.importWallet(pubKey)
+                    Toast.makeText(this, "Wallet Connected Successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Invalid Solana Address", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     private fun startStatusPoller() {
         scope.launch {
             while (isActive) {
@@ -217,7 +236,7 @@ class MainActivity : Activity() {
                     val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
                     logsText.text = logs.ifEmpty { "Scanning analysis modules..." }
                 } catch (e: Exception) {
-                    // Ignore UI poll exceptions
+                    // Ignore transient polling errors
                 }
                 delay(1500)
             }
