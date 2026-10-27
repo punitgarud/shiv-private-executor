@@ -104,7 +104,7 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.parseColor("#222222"))
             setTextColor(Color.parseColor("#FF5555"))
             setOnClickListener {
-                StatusManager.getLogs().clear()
+                StatusManager.clearLogs()
                 StatusManager.appendLog("Logs cleared by user")
             }
         }

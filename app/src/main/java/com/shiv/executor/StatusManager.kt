@@ -18,6 +18,9 @@ object StatusManager {
         if (logs.size > 100) logs.removeAt(0)
         logs.add(log)
     }
+    @Synchronized fun clearLogs() {
+        logs.clear()
+    }
 
     @Synchronized fun getModules(): Map<String, Boolean> = modules.toMap()
     @Synchronized fun setModules(m: Map<String, Boolean>) { modules.clear(); modules.putAll(m) }
