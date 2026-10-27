@@ -16,12 +16,12 @@ object HotWalletManager {
     }
 
     fun init() {
-        // Fallback init if context is unavailable
         isInitialized = true
     }
 
     fun getPublicKey(): String = activePublicKey
     fun getHotWalletPubkey(): String = activePublicKey
+    fun isReady(): Boolean = isInitialized
     
     fun importWallet(pubKey: String) {
         activePublicKey = pubKey
