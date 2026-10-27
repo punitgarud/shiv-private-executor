@@ -32,7 +32,7 @@ object JupiterRealTrader {
             val quoteBody = quoteRes.body?.string()?: return@withContext false
             if (quoteBody.contains("error")) { android.util.Log.e("SHIV", "Quote err: $quoteBody"); return@withContext false }
             val quoteJson = JSONObject(quoteBody)
-            val pubkey = com.shiv.executor.services.HotWalletManager.getHotWalletPubkey(context)?: ""
+            val pubkey = com.shiv.executor.HotWalletManager.getHotWalletPubkey(context)?: ""
             if (pubkey.isEmpty()) { android.util.Log.e("SHIV","No hot_pubkey"); return@withContext false }
             val swapBody = JSONObject()
             swapBody.put("quoteResponse", quoteJson)
