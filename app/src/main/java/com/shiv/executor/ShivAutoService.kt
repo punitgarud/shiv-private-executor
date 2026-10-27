@@ -15,9 +15,10 @@ class ShivAutoService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        HotWalletManager.init()
         val notification: Notification = Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("SHIV v5 BLACK Active")
-            .setContentText("Scanning 40 analysis sites & monitoring data.json")
+            .setContentTitle("SHIV v5 BLACK Execution Active")
+            .setContentText("Running autonomous trading & 40-module risk engine")
             .setSmallIcon(android.R.drawable.ic_menu_compass)
             .build()
         startForeground(1, notification)
@@ -25,32 +26,32 @@ class ShivAutoService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         StatusManager.setRunning(true)
-        StatusManager.appendLog("Service Started")
+        StatusManager.appendLog("Autonomous Execution Service Started")
+        
         serviceScope.launch {
             while (isActive) {
                 try {
                     val topTokens = PerformanceService.fetchTop4()
+                    
+                    // Run backtest simulation check before trading
+                    val simulation = BacktestEngine.runSimulation(topTokens)
+                    StatusManager.appendLog("Simulation Check: WinRate=${simulation.expectedWinRate}%")
+
                     for (token in topTokens) {
-                        if (token.rugScore < 60) {
-                            StatusManager.appendLog("SKIP ${token.id}: rugScore ${token.rugScore} < 60")
-                            continue
-                        }
-                        if (token.unlockDays < 7) {
-                            StatusManager.appendLog("SKIP ${token.id}: unlockDays ${token.unlockDays} < 7")
-                            continue
-                        }
                         if (!PerformanceService.canTrade()) {
-                            StatusManager.appendLog("PAUSE: Daily loss limit reached (>0.05 SOL)")
+                            StatusManager.appendLog("CIRCUIT BREAKER: Daily loss limit reached. Pausing trades.")
                             break
                         }
 
-                        StatusManager.appendLog("EXEC [${token.id}] score=${token.score} rug=${token.rugScore} solPrice=${StatusManager.getLastSolPrice()}")
-                        PerformanceService.recordTrade(true)
-                        StatusManager.appendLog("WIN +0.00 SOL (${token.id})")
+                        if (RiskEngine.evaluateTokenRisk(token)) {
+                            StatusManager.appendLog("SIGNAL CONFIRMED: Executing trade for ${token.id}")
+                            JupiterRealTrader.executeSwap(token.mint, 0.01)
+                        }
                     }
                 } catch (e: Exception) {
-                    StatusManager.appendLog("Sync Error: ${e.message}")
+                    StatusManager.appendLog("Execution Loop Error: ${e.message}")
                 }
+                // Check every 60 seconds
                 delay(60000)
             }
         }
@@ -60,7 +61,7 @@ class ShivAutoService : Service() {
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "SHIV Foreground Service Channel",
+            "SHIV Execution Service Channel",
             NotificationManager.IMPORTANCE_DEFAULT
         )
         val manager = getSystemService(NotificationManager::class.java)
@@ -73,6 +74,6 @@ class ShivAutoService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         StatusManager.setRunning(false)
-        StatusManager.appendLog("Service Stopped")
+        StatusManager.appendLog("Autonomous Execution Service Stopped")
     }
 }
