@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.*
@@ -61,7 +62,7 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & Swap)
+        // Control Buttons Row 1 (Service & MWA Wallet Connect)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -81,12 +82,12 @@ class MainActivity : Activity() {
         }
 
         val btnConnectWallet = Button(this).apply {
-            text = "Connect Wallet"
+            text = "Connect MWA Wallet"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#00E5FF"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                showWalletConnectDialog()
+                triggerMobileWalletAdapter()
             }
         }
 
@@ -191,7 +192,19 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
-    private fun showWalletConnectDialog() {
+    private fun triggerMobileWalletAdapter() {
+        try {
+            // Standard Solana Mobile Wallet Adapter (MWA) intent scheme for Seeker / Phantom / Solflare
+            val mwaIntent = Intent(Intent.ACTION_VIEW, Uri.parse("solana-wallet://v1/authorize?cluster=mainnet-beta"))
+            startActivity(mwaIntent)
+            StatusManager.appendLog("MWA: Dispatched Solana Mobile Wallet Adapter authorize intent")
+        } catch (e: Exception) {
+            // Fallback to manual pubkey dialog if wallet provider app is not directly listening via deep link
+            showManualWalletFallbackDialog()
+        }
+    }
+
+    private fun showManualWalletFallbackDialog() {
         val input = EditText(this).apply {
             hint = "Enter Solana Public Key / Address"
             setTextColor(Color.WHITE)
@@ -199,8 +212,8 @@ class MainActivity : Activity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Connect Solana Wallet")
-            .setMessage("Enter your Solana wallet address or Seeker Seed Vault pubkey:")
+            .setTitle("Solana Seeker Wallet Connect")
+            .setMessage("No MWA wallet provider intercepted the intent. Enter your Seeker Seed Vault address:")
             .setView(input)
             .setPositiveButton("Connect") { _, _ ->
                 val pubKey = input.text.toString().trim()
@@ -236,7 +249,7 @@ class MainActivity : Activity() {
                     val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
                     logsText.text = logs.ifEmpty { "Scanning analysis modules..." }
                 } catch (e: Exception) {
-                    // Ignore transient polling errors
+                    // Ignore transient polling exceptions
                 }
                 delay(1500)
             }
