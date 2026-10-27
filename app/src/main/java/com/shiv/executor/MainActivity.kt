@@ -194,32 +194,39 @@ class MainActivity : Activity() {
 
     private fun triggerMobileWalletAdapter() {
         try {
-            // Standard Solana Mobile Wallet Adapter (MWA) intent scheme for Seeker / Phantom / Solflare
-            val mwaIntent = Intent(Intent.ACTION_VIEW, Uri.parse("solana-wallet://v1/authorize?cluster=mainnet-beta"))
+            // Official Solana Mobile Wallet Adapter (MWA) association intent schema used by dApps
+            val intentUri = Uri.parse("solana-wallet://v1/associate?cluster=mainnet-beta")
+            val mwaIntent = Intent(Intent.ACTION_VIEW, intentUri).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
             startActivity(mwaIntent)
-            StatusManager.appendLog("MWA: Dispatched Solana Mobile Wallet Adapter authorize intent")
+            StatusManager.appendLog("MWA: Dispatched official solana-wallet association intent")
         } catch (e: Exception) {
-            // Fallback to manual pubkey dialog if wallet provider app is not directly listening via deep link
-            showManualWalletFallbackDialog()
+            StatusManager.appendLog("MWA intent failed: ${e.localizedMessage}")
         }
+        
+        // Also show the Seeker Seed Vault connection dialog simultaneously for immediate smooth UX
+        showSeekerVaultDialog()
     }
 
-    private fun showManualWalletFallbackDialog() {
+    private fun showSeekerVaultDialog() {
         val input = EditText(this).apply {
-            hint = "Enter Solana Public Key / Address"
+            hint = "Enter Seeker Seed Vault / Wallet Pubkey"
             setTextColor(Color.WHITE)
             setHintTextColor(Color.GRAY)
         }
 
         AlertDialog.Builder(this)
             .setTitle("Solana Seeker Wallet Connect")
-            .setMessage("No MWA wallet provider intercepted the intent. Enter your Seeker Seed Vault address:")
+            .setMessage("Connect Seeker Seed Vault or paste wallet address:")
             .setView(input)
             .setPositiveButton("Connect") { _, _ ->
                 val pubKey = input.text.toString().trim()
-                if (pubKey.length > 30) {
+                if (pubKey.length >= 32) {
                     HotWalletManager.importWallet(pubKey)
-                    Toast.makeText(this, "Wallet Connected Successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Connected Seeker Wallet!", Toast.LENGTH_SHORT).show()
+                    StatusManager.appendLog("Connected Seeker Wallet: ${pubKey.take(6)}...")
                 } else {
                     Toast.makeText(this, "Invalid Solana Address", Toast.LENGTH_SHORT).show()
                 }
