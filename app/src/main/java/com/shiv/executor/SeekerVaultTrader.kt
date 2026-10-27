@@ -1,10 +1,27 @@
 package com.shiv.executor
+
 object SeekerVaultTrader {
-    suspend fun executeSwapWithVault(activity: android.app.Activity, mint: String, amountLamports: Long, slippageBps: Int, isBuy: Boolean): String {
-        val inputMint = if (isBuy) "So11111111111111111111111111111111111111112" else mint
-        val outputMint = if (isBuy) mint else "So11111111111111111111111111111111111111112"
-        val amountSol = amountLamports / 1_000_000_000.0
-        val ok = JupiterRealTrader.executeReal(activity, inputMint, outputMint, amountSol, slippageBps)
-        return if (ok) "TX_SENT_MWA" else "FAILED"
+    suspend fun executeReal(mint: String, amount: Double): Boolean {
+        StatusManager.appendLog("SeekerVaultTrader: Executing real trade on Seeker ecosystem for mint $mint")
+        return executeSwap(mint, amount)
+    }
+
+    suspend fun executeSwap(mint: String, amount: Double): Boolean {
+        if (!HotWalletManager.isReady()) {
+            StatusManager.appendLog("SeekerVaultTrader Error: HotWalletManager not ready")
+            return false
+        }
+        val pubKey = HotWalletManager.getHotWalletPubkey()
+        StatusManager.appendLog("Executing Seeker Vault swap for mint: $mint | Wallet: $pubKey")
+        
+        val success = HotWalletManager.signAndSendTransaction(mint, amount)
+        if (success) {
+            PerformanceService.recordTrade(true)
+            StatusManager.appendLog("SUCCESS: Seeker Vault swapped \$${amount}SOL for $mint")
+        } else {
+            PerformanceService.recordTrade(false)
+            StatusManager.appendLog("FAIL: Seeker Vault swap rejected for $mint")
+        }
+        return success
     }
 }
