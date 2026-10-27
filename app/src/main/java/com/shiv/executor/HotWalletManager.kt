@@ -10,7 +10,14 @@ object HotWalletManager {
     }
 
     fun getPublicKey(): String = activePublicKey
-    fun setPublicKey(pubKey: String) { activePublicKey = pubKey }
+    
+    // Alias expected by JupiterRealTrader and other dApp modules
+    fun getHotWalletPubkey(): String = activePublicKey
+
+    fun setPublicKey(pubKey: String) { 
+        activePublicKey = pubKey 
+    }
+
     fun isReady(): Boolean = isInitialized
 
     fun signAndSendTransaction(mint: String, amount: Double): Boolean {
