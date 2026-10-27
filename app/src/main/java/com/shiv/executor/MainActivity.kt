@@ -2,87 +2,134 @@ package com.shiv.executor
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.Gravity
+import android.widget.*
+import kotlinx.coroutines.*
 
 class MainActivity : Activity() {
     private lateinit var statusText: TextView
     private lateinit var logsText: TextView
-    private val handler = Handler(Looper.getMainLooper())
-    private val updateRunnable = object : Runnable {
-        override fun run() {
-            updateUI()
-            handler.postDelayed(this, 1000)
-        }
-    }
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         HotWalletManager.init()
-        
-        val layout = LinearLayout(this).apply {
+
+        val rootLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.parseColor("#0A0A0A"))
             setPadding(32, 32, 32, 32)
-            setBackgroundColor(0xFF000000.toInt())
         }
 
-        val title = TextView(this).apply {
-            text = "SHIV v5 BLACK"
-            textSize = 22f
-            setTextColor(0xFF00FF00.toInt())
-            setPadding(0, 0, 0, 24)
+        // App Header
+        val header = TextView(this).apply {
+            text = "⚡ SHIV v5 BLACK"
+            textSize = 24f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(Color.parseColor("#00FF66"))
+            setPadding(0, 0, 0, 16)
         }
-        layout.addView(title)
+        rootLayout.addView(header)
 
+        // Status Card View
         statusText = TextView(this).apply {
-            text = "Initializing..."
+            text = "Balance: 1.0 SOL | Daily Loss: 0.0 SOL\nCan Trade: true | Wallet: Connected"
             textSize = 14f
-            setTextColor(0xFFFFFFFF.toInt())
-            setPadding(0, 0, 0, 24)
+            setTextColor(Color.parseColor("#CCCCCC"))
+            setBackgroundColor(Color.parseColor("#161616"))
+            setPadding(24, 24, 24, 24)
         }
-        layout.addView(statusText)
+        rootLayout.addView(statusText)
 
-        val startBtn = Button(this).apply {
-            text = "Start Executor Service"
+        // Action Buttons Layout
+        val buttonLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 24, 0, 24)
+            gravity = Gravity.CENTER
+        }
+
+        val btnToggleService = Button(this).apply {
+            text = "Toggle Executor Service"
+            setBackgroundColor(Color.parseColor("#00FF66"))
+            setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
                 val intent = Intent(this@MainActivity, ShivAutoService::class.java)
                 startForegroundService(intent)
-                StatusManager.setRunning(true)
-                StatusManager.appendLog("Service Started")
+                Toast.makeText(this@MainActivity, "SHIV Service Started", Toast.LENGTH_SHORT).show()
             }
         }
-        layout.addView(startBtn)
+
+        val btnViewHistory = Button(this).apply {
+            text = "View History"
+            setBackgroundColor(Color.parseColor("#222222"))
+            setTextColor(Color.parseColor("#00FF66"))
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, HistoryActivity::class.java))
+            }
+        }
+
+        buttonLayout.addView(btnToggleService)
+        buttonLayout.addView(btnViewHistory)
+        rootLayout.addView(buttonLayout)
+
+        // Logs Header
+        val logsHeader = TextView(this).apply {
+            text = "Live Execution Logs:"
+            textSize = 16f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(Color.parseColor("#00FF66"))
+            setPadding(0, 16, 0, 8)
+        }
+        rootLayout.addView(logsHeader)
+
+        // Scrollable Live Logs
+        val scrollView = ScrollView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+        }
 
         logsText = TextView(this).apply {
-            text = "Logs:\n"
+            text = "Initializing SHIV v5 BLACK Seeker dApp...\n"
             textSize = 12f
-            setTextColor(0xFF00FF00.toInt())
-            setPadding(0, 24, 0, 0)
+            setTextColor(Color.parseColor("#00FF66"))
+            typeface = android.graphics.Typeface.MONOSPACE
         }
-        layout.addView(logsText)
+        scrollView.addView(logsText)
+        rootLayout.addView(scrollView)
 
-        setContentView(layout)
+        setContentView(rootLayout)
+
+        // Periodically refresh UI status and logs
+        startStatusPoller()
     }
 
-    override fun onResume() {
-        super.onResume()
-        handler.post(updateRunnable)
+    private fun startStatusPoller() {
+        scope.launch {
+            while (isActive) {
+                try {
+                    val balance = StatusManager.getBalance()
+                    val dailyLoss = StatusManager.getDailyLoss()
+                    val canTrade = PerformanceService.canTrade()
+                    val pubKey = HotWalletManager.getHotWalletPubkey()
+
+                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade | Wallet: ${pubKey.take(6)}...${pubKey.takeLast(4)}"
+                    
+                    val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
+                    logsText.text = logs.ifEmpty { "Scanning 40 analysis modules..." }
+                } catch (e: Exception) {
+                    // Ignore transient UI refresh errors
+                }
+                delay(2000)
+            }
+        }
     }
 
-    override fun onPause() {
-        super.onPause()
-        handler.removeCallbacks(updateRunnable)
-    }
-
-    private fun updateUI() {
-        val balance = StatusManager.getBalance()
-        val loss = StatusManager.getDailyLoss()
-        statusText.text = "Balance: $balance SOL | Daily Loss: $loss SOL\nCan Trade: ${PerformanceService.canTrade()}"
-        val logs = StatusManager.getLogs().takeLast(10).joinToString("\n")
-        logsText.text = "Logs:\n$logs"
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
     }
 }
