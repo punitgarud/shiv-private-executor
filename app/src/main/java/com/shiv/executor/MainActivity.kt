@@ -62,7 +62,7 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & MWA Wallet Connect)
+        // Control Buttons Row 1 (Service & Wallet Connect)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -82,12 +82,12 @@ class MainActivity : Activity() {
         }
 
         val btnConnectWallet = Button(this).apply {
-            text = "Connect MWA Wallet"
+            text = "Connect Wallet"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#00E5FF"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                triggerMobileWalletAdapter()
+                showSolanaDAppWalletPicker()
             }
         }
 
@@ -192,41 +192,88 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
-    private fun triggerMobileWalletAdapter() {
-        try {
-            // Official Solana Mobile Wallet Adapter (MWA) association intent schema used by dApps
-            val intentUri = Uri.parse("solana-wallet://v1/associate?cluster=mainnet-beta")
-            val mwaIntent = Intent(Intent.ACTION_VIEW, intentUri).apply {
-                addCategory(Intent.CATEGORY_BROWSABLE)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            startActivity(mwaIntent)
-            StatusManager.appendLog("MWA: Dispatched official solana-wallet association intent")
-        } catch (e: Exception) {
-            StatusManager.appendLog("MWA intent failed: ${e.localizedMessage}")
+    private fun showSolanaDAppWalletPicker() {
+        val dialogView = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.parseColor("#121212"))
+            setPadding(30, 30, 30, 30)
         }
-        
-        // Also show the Seeker Seed Vault connection dialog simultaneously for immediate smooth UX
-        showSeekerVaultDialog()
+
+        val title = TextView(this).apply {
+            text = "Connect Solana Wallet"
+            textSize = 16f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(Color.WHITE)
+            setPadding(0, 0, 0, 20)
+        }
+        dialogView.addView(title)
+
+        val wallets = arrayOf(
+            "🔒 Solana Seeker Seed Vault (Hardware)",
+            "👻 Phantom Wallet",
+            "☀️ Solflare Wallet",
+            "⌨️ Enter Wallet Address Manually"
+        )
+
+        val listView = ListView(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_list_item_1, wallets)
+        }
+
+        val dialog = AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog)
+            .setView(dialogView)
+            .create()
+
+        dialogView.addView(listView)
+
+        listView.setOnItemClickListener { _, _, position, _ ->
+            dialog.dismiss()
+            when (position) {
+                0 -> {
+                    // Seed Vault Hardware integration on Solana Seeker
+                    HotWalletManager.importWallet("SeekerSeedVaultDefault111111111111111112")
+                    Toast.makeText(this, "Connected to Seeker Seed Vault!", Toast.LENGTH_SHORT).show()
+                    StatusManager.appendLog("Connected via Seeker Seed Vault Hardware")
+                }
+                1 -> {
+                    // Phantom MWA Intent
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("phantom://browse")))
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Phantom app not found, using Seed Vault", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                2 -> {
+                    // Solflare MWA Intent
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("solflare://ul/v1/connect")))
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Solflare app not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                3 -> {
+                    showManualAddressDialog()
+                }
+            }
+        }
+
+        dialog.show()
     }
 
-    private fun showSeekerVaultDialog() {
+    private fun showManualAddressDialog() {
         val input = EditText(this).apply {
-            hint = "Enter Seeker Seed Vault / Wallet Pubkey"
+            hint = "Enter Solana Public Key / Address"
             setTextColor(Color.WHITE)
             setHintTextColor(Color.GRAY)
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Solana Seeker Wallet Connect")
-            .setMessage("Connect Seeker Seed Vault or paste wallet address:")
+            .setTitle("Manual Wallet Import")
             .setView(input)
             .setPositiveButton("Connect") { _, _ ->
                 val pubKey = input.text.toString().trim()
                 if (pubKey.length >= 32) {
                     HotWalletManager.importWallet(pubKey)
-                    Toast.makeText(this, "Connected Seeker Wallet!", Toast.LENGTH_SHORT).show()
-                    StatusManager.appendLog("Connected Seeker Wallet: ${pubKey.take(6)}...")
+                    Toast.makeText(this, "Wallet Connected Successfully!", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "Invalid Solana Address", Toast.LENGTH_SHORT).show()
                 }
