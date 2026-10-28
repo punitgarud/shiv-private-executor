@@ -39,7 +39,5 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    // Official Solana Mobile Wallet Adapter Client Library for Seeker Seed Vault & MWA wallets
-    implementation("com.solana.mobilewalletadapter:mobile-wallet-adapter-clientlib-ktx:2.0.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 }

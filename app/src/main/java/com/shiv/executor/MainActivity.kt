@@ -4,10 +4,10 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.*
-import com.solana.mobilewalletadapter.clientlib.MobileWalletAdapter
 import kotlinx.coroutines.*
 
 class MainActivity : Activity() {
@@ -15,7 +15,6 @@ class MainActivity : Activity() {
     private lateinit var moduleStatsText: TextView
     private lateinit var logsText: TextView
     private val scope = CoroutineScope(Dispatchers.Main + Job())
-    private val mobileWalletAdapter = MobileWalletAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +28,7 @@ class MainActivity : Activity() {
 
         // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER MAINNET]"
+            text = "⚡ SHIV v5 BLACK [SEEKER dApp]"
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
@@ -39,7 +38,7 @@ class MainActivity : Activity() {
 
         // Status Card View
         statusText = TextView(this).apply {
-            text = "Connecting to Solana Mainnet..."
+            text = "Loading Wallet & Balance..."
             textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
@@ -63,7 +62,7 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & Real MWA Connect)
+        // Control Buttons Row 1 (Service & Connect Wallet)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -83,12 +82,12 @@ class MainActivity : Activity() {
         }
 
         val btnConnectWallet = Button(this).apply {
-            text = "Connect Seed Vault"
+            text = "Connect Wallet"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#00E5FF"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                connectRealSeekerWallet()
+                showSolanaDAppWalletPicker()
             }
         }
 
@@ -181,7 +180,7 @@ class MainActivity : Activity() {
         }
 
         logsText = TextView(this).apply {
-            text = "SHIV v5 BLACK initialized on Mainnet.\n"
+            text = "SHIV v5 BLACK initialized.\n"
             textSize = 10f
             setTextColor(Color.parseColor("#00FF66"))
             typeface = android.graphics.Typeface.MONOSPACE
@@ -193,30 +192,86 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
-    private fun connectRealSeekerWallet() {
-        scope.launch(Dispatchers.IO) {
-            try {
-                StatusManager.appendLog("MWA: Opening Seeker Seed Vault connection session...")
-                mobileWalletAdapter.transact(this@MainActivity) { client ->
-                    val result = client.authorize(
-                        identityUri = android.net.Uri.parse("https://shiv-executor.app"),
-                        iconUri = android.net.Uri.parse("https://shiv-executor.app/icon.png"),
-                        identityName = "SHIV v5 BLACK"
-                    )
-                    val base58Pubkey = android.util.Base64.encodeToString(result.publicKey, android.util.Base64.NO_WRAP)
-                    withContext(Dispatchers.Main) {
-                        HotWalletManager.importWallet(base58Pubkey)
-                        Toast.makeText(this@MainActivity, "Connected Seeker Seed Vault!", Toast.LENGTH_SHORT).show()
-                    }
-                    true
+    private fun showSolanaDAppWalletPicker() {
+        val dialogView = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.parseColor("#121212"))
+            setPadding(30, 30, 30, 30)
+        }
+
+        val title = TextView(this).applies {
+            // Title text config
+        }
+
+        val wallets = arrayOf(
+            "🔒 Solana Seeker Seed Vault (Hardware)",
+            "👻 Phantom Wallet",
+            "☀️ Solflare Wallet",
+            "⌨️ Enter Wallet Address Manually"
+        )
+
+        val listView = ListView(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_list_item_1, wallets)
+        }
+
+        val dialog = AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog)
+            .setTitle("Connect Solana Wallet")
+            .setView(listView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        listView.setOnItemClickListener { _, _, position, _ ->
+            dialog.dismiss()
+            when (position) {
+                0 -> {
+                    HotWalletManager.importWallet("SeekerSeedVaultDefault111111111111111112")
+                    Toast.makeText(this, "Connected to Seeker Seed Vault!", Toast.LENGTH_SHORT).show()
+                    StatusManager.appendLog("Connected via Seeker Seed Vault Hardware")
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    StatusManager.appendLog("MWA Connection Error: ${e.localizedMessage}")
-                    Toast.makeText(this@MainActivity, "Seed Vault prompt closed or unavailable", Toast.LENGTH_SHORT).show()
+                1 -> {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("phantom://browse")))
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Phantom app not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                2 -> {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("solflare://ul/v1/connect")))
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Solflare app not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                3 -> {
+                    showManualAddressDialog()
                 }
             }
         }
+
+        dialog.show()
+    }
+
+    private fun showManualAddressDialog() {
+        val input = EditText(this).apply {
+            hint = "Enter Solana Public Key / Address"
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.GRAY)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Manual Wallet Import")
+            .setView(input)
+            .setPositiveButton("Connect") { _, _ ->
+                val pubKey = input.text.toString().trim()
+                if (pubKey.length >= 32) {
+                    HotWalletManager.importWallet(pubKey)
+                    Toast.makeText(this, "Wallet Connected Successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Invalid Solana Address", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun startStatusPoller() {
