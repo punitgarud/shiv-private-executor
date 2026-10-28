@@ -193,16 +193,6 @@ class MainActivity : Activity() {
     }
 
     private fun showSolanaDAppWalletPicker() {
-        val dialogView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.parseColor("#121212"))
-            setPadding(30, 30, 30, 30)
-        }
-
-        val title = TextView(this).applies {
-            // Title text config
-        }
-
         val wallets = arrayOf(
             "🔒 Solana Seeker Seed Vault (Hardware)",
             "👻 Phantom Wallet",
