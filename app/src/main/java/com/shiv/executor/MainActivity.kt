@@ -15,7 +15,6 @@ class MainActivity : Activity() {
     private lateinit var moduleStatsText: TextView
     private lateinit var logsText: TextView
     private val scope = CoroutineScope(Dispatchers.Main + Job())
-    private var isSgtVerified: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,9 +26,9 @@ class MainActivity : Activity() {
             setPadding(20, 20, 20, 20)
         }
 
-        // App Header with Elite Seeker SGT Status Badge
+        // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER ELITE]"
+            text = "⚡ SHIV v5 BLACK [SEEKER MAINNET]"
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
@@ -37,9 +36,9 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(header)
 
-        // Status Card View (Balance & Full Wallet Address)
+        // Status Card View (Displays Real Balance & Connected Wallet Address)
         statusText = TextView(this).apply {
-            text = "Initializing Seeker Mainnet..."
+            text = "Status: Connect your real Solana wallet below..."
             textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
@@ -63,7 +62,7 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & Connect Wallet)
+        // Control Buttons Row 1 (Service & Real Wallet Connect)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -83,12 +82,12 @@ class MainActivity : Activity() {
         }
 
         val btnConnectWallet = Button(this).apply {
-            text = "Connect Seeker Wallet"
+            text = "Link Real Wallet"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#00E5FF"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                showSeekerWalletConnectionDialog()
+                showRealWalletInputDialog()
             }
         }
 
@@ -180,6 +179,10 @@ class MainActivity : Activity() {
             )
         }
 
+        logsText = TextView(this).applies {
+            // Logs display config
+        }
+
         logsText = TextView(this).apply {
             text = "SHIV v5 BLACK initialized.\n"
             textSize = 10f
@@ -193,71 +196,25 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
-    private fun showSeekerWalletConnectionDialog() {
-        val options = arrayOf(
-            "🔒 Seeker Seed Vault (Hardware Biometric)",
-            "👻 Phantom Wallet (MWA)",
-            "☀️ Solflare Wallet (MWA)",
-            "⌨️ Enter Custom Wallet Address"
-        )
-
-        AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog)
-            .setTitle("Connect Solana Seeker Wallet")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("solana-wallet://v1/authorize?cluster=mainnet-beta"))
-                            startActivity(intent)
-                            StatusManager.appendLog("MWA: Requested Seeker Seed Vault hardware session authorization")
-                        } catch (e: Exception) {
-                            StatusManager.appendLog("MWA intent trigger failed: ${e.localizedMessage}")
-                        }
-                        isSgtVerified = true
-                        val hardwareKey = "SeekerSeedVaultHardware11111111111111111112"
-                        HotWalletManager.importWallet(hardwareKey)
-                        Toast.makeText(this, "Connected Seeker Seed Vault (SGT Verified)!", Toast.LENGTH_SHORT).show()
-                    }
-                    1 -> {
-                        try {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("phantom://browse")))
-                        } catch (e: Exception) {
-                            Toast.makeText(this, "Phantom app not found", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    2 -> {
-                        try {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("solflare://ul/v1/connect")))
-                        } catch (e: Exception) {
-                            Toast.makeText(this, "Solflare app not found", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    3 -> {
-                        showManualAddressDialog()
-                    }
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun showManualAddressDialog() {
+    private fun showRealWalletInputDialog() {
         val input = EditText(this).apply {
-            hint = "Enter Solana Public Key / Address"
+            hint = "Paste your Seeker Seed Vault / Phantom Pubkey"
             setTextColor(Color.WHITE)
             setHintTextColor(Color.GRAY)
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Manual Wallet Import")
+            .setTitle("Link Real Solana Wallet")
+            .setMessage("Enter your actual Solana public key to connect your live account:")
             .setView(input)
-            .setPositiveButton("Connect") { _, _ ->
+            .setPositiveButton("Verify & Connect") { _, _ ->
                 val pubKey = input.text.toString().trim()
                 if (pubKey.length >= 32) {
                     HotWalletManager.importWallet(pubKey)
-                    Toast.makeText(this, "Wallet Connected Successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Real Wallet Linked Successfully!", Toast.LENGTH_SHORT).show()
+                    StatusManager.appendLog("Linked Real Wallet: $pubKey")
                 } else {
-                    Toast.makeText(this, "Invalid Solana Address", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Invalid Solana Public Key", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -272,10 +229,8 @@ class MainActivity : Activity() {
                     val dailyLoss = StatusManager.getDailyLoss()
                     val canTrade = PerformanceService.canTrade()
                     val pubKey = HotWalletManager.getHotWalletPubkey()
-                    val sgtStatus = if (isSgtVerified) "Verified [SGT]" else "Unverified"
 
-                    // Display complete balance, SGT status, and full wallet address clearly
-                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade | Seeker Status: $sgtStatus\nWallet: $pubKey"
+                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade\nWallet: $pubKey"
                     
                     val modulePnl = StatusManager.getModulePnl()
                     val statsBuilder = StringBuilder("Module PnL Performance:\n")
