@@ -36,9 +36,9 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(header)
 
-        // Status Card View (Displays Real Balance & Connected Wallet Address)
+        // Status Card View (Displays Real On-Chain Balance & Wallet Address)
         statusText = TextView(this).apply {
-            text = "Status: Connect your real Solana wallet below..."
+            text = "Fetching live on-chain balance..."
             textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
@@ -221,7 +221,8 @@ class MainActivity : Activity() {
         scope.launch {
             while (isActive) {
                 try {
-                    val balance = StatusManager.getBalance()
+                    // Fetch live on-chain balance from Solana mainnet cluster
+                    val balance = HotWalletManager.fetchOnChainBalance()
                     val dailyLoss = StatusManager.getDailyLoss()
                     val canTrade = PerformanceService.canTrade()
                     val pubKey = HotWalletManager.getHotWalletPubkey()
@@ -240,7 +241,7 @@ class MainActivity : Activity() {
                 } catch (e: Exception) {
                     // Ignore transient polling exceptions
                 }
-                delay(1500)
+                delay(2000)
             }
         }
     }
