@@ -179,10 +179,6 @@ class MainActivity : Activity() {
             )
         }
 
-        logsText = TextView(this).applies {
-            // Logs display config
-        }
-
         logsText = TextView(this).apply {
             text = "SHIV v5 BLACK initialized.\n"
             textSize = 10f
