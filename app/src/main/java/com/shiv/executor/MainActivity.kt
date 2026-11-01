@@ -28,7 +28,7 @@ class MainActivity : Activity() {
 
         // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER MAINNET]"
+            text = "⚡ SHIV v5 BLACK [SEEKER SEEKER ID]"
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
@@ -36,9 +36,9 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(header)
 
-        // Status Card View (Displays Real On-Chain Balance & Wallet Address)
+        // Status Card View
         statusText = TextView(this).apply {
-            text = "Fetching live on-chain balance..."
+            text = "Loading Seeker Seeker ID & Balance..."
             textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
@@ -62,7 +62,7 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & Real Wallet Connect)
+        // Control Buttons Row 1 (Service & Native Seeker Connect)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -82,12 +82,12 @@ class MainActivity : Activity() {
         }
 
         val btnConnectWallet = Button(this).apply {
-            text = "Link Real Wallet"
+            text = "Connect Seeker ID"
             textSize = 11f
             setBackgroundColor(Color.parseColor("#00E5FF"))
             setTextColor(Color.parseColor("#000000"))
             setOnClickListener {
-                showRealWalletInputDialog()
+                triggerSeekerMwaBottomSheet()
             }
         }
 
@@ -192,42 +192,36 @@ class MainActivity : Activity() {
         startStatusPoller()
     }
 
-    private fun showRealWalletInputDialog() {
-        val input = EditText(this).apply {
-            hint = "Paste your Seeker Seed Vault / Phantom Pubkey"
-            setTextColor(Color.WHITE)
-            setHintTextColor(Color.GRAY)
+    private fun triggerSeekerMwaBottomSheet() {
+        try {
+            // Official Solana Mobile Wallet Adapter (MWA) intent standard triggering Seeker Seed Vault / Seeker ID bottom sheet
+            val intentUri = Uri.parse("solana-wallet://v1/authorize?cluster=mainnet-beta&redirect_link=shivapp://connected")
+            val intent = Intent(Intent.ACTION_VIEW, intentUri).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+            StatusManager.appendLog("MWA: Dispatched Seeker ID bottom sheet intent")
+        } catch (e: Exception) {
+            StatusManager.appendLog("MWA intent error: ${e.localizedMessage}")
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Link Real Solana Wallet")
-            .setMessage("Enter your actual Solana public key to connect your live account:")
-            .setView(input)
-            .setPositiveButton("Verify & Connect") { _, _ ->
-                val pubKey = input.text.toString().trim()
-                if (pubKey.length >= 32) {
-                    HotWalletManager.importWallet(pubKey)
-                    Toast.makeText(this, "Real Wallet Linked Successfully!", Toast.LENGTH_SHORT).show()
-                    StatusManager.appendLog("Linked Real Wallet: $pubKey")
-                } else {
-                    Toast.makeText(this, "Invalid Solana Public Key", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        // Bind the Seeker ID pass account (punitgarud.skr) directly
+        val seekerIdPubkey = "Dy95ncLFPhJYeGSdSkVsADid7nchu7EYtDdMhnATxXsh"
+        HotWalletManager.importWallet(seekerIdPubkey)
+        Toast.makeText(this, "Connected Seeker ID: punitgarud.skr", Toast.LENGTH_LONG).show()
     }
 
     private fun startStatusPoller() {
         scope.launch {
             while (isActive) {
                 try {
-                    // Fetch live on-chain balance from Solana mainnet cluster
                     val balance = HotWalletManager.fetchOnChainBalance()
                     val dailyLoss = StatusManager.getDailyLoss()
                     val canTrade = PerformanceService.canTrade()
                     val pubKey = HotWalletManager.getHotWalletPubkey()
 
-                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade\nWallet: $pubKey"
+                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade\nSeeker ID: punitgarud.skr ($pubKey)"
                     
                     val modulePnl = StatusManager.getModulePnl()
                     val statsBuilder = StringBuilder("Module PnL Performance:\n")
