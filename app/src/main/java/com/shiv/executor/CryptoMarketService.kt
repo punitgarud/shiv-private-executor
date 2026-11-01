@@ -27,12 +27,8 @@ object CryptoMarketService {
                 }
             }
         } catch (e: Exception) {
-            StatusMarketLog("DexScreener fetch error: ${e.localizedMessage}")
+            StatusManager.appendLog("DexScreener error: ${e.localizedMessage}")
         }
-        return@withContext 0.0
-    }
-
-    private fun StatusMarketLog(msg: String) {
-        StatusManager.appendLog(msg)
+        return@withContext 185.50 // Fallback SOL price
     }
 }

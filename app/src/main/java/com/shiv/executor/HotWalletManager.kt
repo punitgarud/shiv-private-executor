@@ -10,19 +10,15 @@ import java.net.URL
 
 object HotWalletManager {
     private var isInitialized: Boolean = false
-    private var activePublicKey: String = "So11111111111111111111111111111111111111112"
+    private var activePublicKey: String = "Dy95ncLFPhJYeGSdSkVsADid7nchu7EYtDdMhnATxXsh"
     private var liveBalance: Double = 1.0
     private lateinit var prefs: SharedPreferences
 
     fun init(context: Context) {
         prefs = context.getSharedPreferences("shiv_wallet_prefs", Context.MODE_PRIVATE)
-        activePublicKey = prefs.getString("saved_pubkey", "So11111111111111111111111111111111111111112") ?: "So11111111111111111111111111111111111111112"
+        activePublicKey = prefs.getString("saved_pubkey", "Dy95ncLFPhJYeGSdSkVsADid7nchu7EYtDdMhnATxXsh") ?: "Dy95ncLFPhJYeGSdSkVsADid7nchu7EYtDdMhnATxXsh"
         isInitialized = true
-        StatusManager.appendLog("HotWalletManager initialized with key: ${activePublicKey.take(6)}...")
-    }
-
-    fun init() {
-        isInitialized = true
+        StatusManager.appendLog("HotWalletManager initialized: ${activePublicKey.take(6)}...")
     }
 
     fun getPublicKey(): String = activePublicKey
@@ -69,7 +65,7 @@ object HotWalletManager {
                 }
             }
         } catch (e: Exception) {
-            // Fallback to current cached balance if offline/transient
+            // Fallback to current balance
         }
         return@withContext StatusManager.getBalance()
     }
@@ -77,19 +73,16 @@ object HotWalletManager {
     fun deposit(amount: Double): Boolean {
         liveBalance = StatusManager.getBalance() + amount
         StatusManager.setBalance(liveBalance)
-        StatusManager.appendLog("DEPOSIT: Added +$amount SOL. New Balance: $liveBalance SOL")
+        StatusManager.appendLog("DEPOSIT: +$amount SOL. Balance: $liveBalance SOL")
         return true
     }
 
     fun withdraw(amount: Double): Boolean {
         val current = StatusManager.getBalance()
-        if (current < amount) {
-            StatusManager.appendLog("WITHDRAW FAIL: Insufficient balance ($current SOL)")
-            return false
-        }
+        if (current < amount) return false
         liveBalance = current - amount
         StatusManager.setBalance(liveBalance)
-        StatusManager.appendLog("WITHDRAW: Sent -$amount SOL. Remaining: $liveBalance SOL")
+        StatusManager.appendLog("WITHDRAW: -$amount SOL. Remaining: $liveBalance SOL")
         return true
     }
 }

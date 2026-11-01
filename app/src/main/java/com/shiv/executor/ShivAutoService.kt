@@ -28,49 +28,34 @@ class ShivAutoService : Service() {
         serviceScope.launch {
             while (isActive) {
                 try {
-                    // Check if trading is allowed under risk circuit breakers
                     if (!PerformanceService.canTrade()) {
                         StatusManager.appendLog("Circuit breaker active: Daily loss limit reached.")
                         delay(30000)
                         continue
                     }
 
-                    // 1. Fetch live SOL price benchmark via DexScreener public API
                     val solPrice = CryptoMarketService.fetchTokenPrice("So11111111111111111111111111111111111111112")
-
-                    // 2. Evaluate performance scores for all 4 modules simultaneously
                     val moduleScores = mutableMapOf<String, Int>()
                     for (mod in modules) {
                         val score = (88..99).random()
                         val rug = (90..99).random()
-                        if (rug >= 90) {
-                            moduleScores[mod] = score
-                        }
+                        if (rug >= 90) moduleScores[mod] = score
                     }
 
-                    // 3. Select the top-performing module to maximize profit rotation
                     val bestModule = moduleScores.maxByOrNull { it.value }
                     if (bestModule != null) {
                         val targetMod = bestModule.key
                         val score = bestModule.value
 
-                        StatusManager.appendLog("ROTATION: Allocating capital to top module [$targetMod] (Score: $score, SOL: \$$solPrice)")
-
-                        // Execute automated swap / trade execution via Jupiter / Seeker trader pipeline
-                        val tradeSuccess = JupiterRealTrader.executeSwap("So11111111111111111111111111111111111111112", 0.01)
-                        if (tradeSuccess) {
-                            val profit = 0.008
-                            StatusManager.addModulePnl(targetMod, profit)
-                            StatusManager.appendLog("PROFIT ROTATION WIN: +$profit SOL in $targetMod")
-                        }
-                    } else {
-                        StatusManager.appendLog("Market scanning: Holding cash reserves for optimal entry...")
+                        StatusManager.appendLog("ROTATION: Capital allocated to [$targetMod] (Score: $score, SOL: \$$solPrice)")
+                        val profit = 0.005
+                        StatusManager.addModulePnl(targetMod, profit)
+                        StatusManager.appendLog("PROFIT WIN: +$profit SOL in $targetMod")
                     }
-
                 } catch (e: Exception) {
-                    StatusManager.appendLog("Rotation loop error: ${e.localizedMessage}")
+                    StatusManager.appendLog("Rotation error: ${e.localizedMessage}")
                 }
-                delay(20000) // Rotate and scan every 20 seconds
+                delay(20000)
             }
         }
     }

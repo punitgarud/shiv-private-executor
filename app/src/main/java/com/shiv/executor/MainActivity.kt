@@ -26,9 +26,8 @@ class MainActivity : Activity() {
             setPadding(20, 20, 20, 20)
         }
 
-        // App Header
         val header = TextView(this).apply {
-            text = "⚡ SHIV v5 BLACK [SEEKER SEEKER ID]"
+            text = "⚡ SHIV v5 BLACK [SEEKER ID]"
             textSize = 18f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(Color.parseColor("#00FF66"))
@@ -36,9 +35,8 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(header)
 
-        // Status Card View
         statusText = TextView(this).apply {
-            text = "Loading Seeker Seeker ID & Balance..."
+            text = "Loading Seeker ID & On-Chain Balance..."
             textSize = 12f
             setTextColor(Color.parseColor("#DDDDDD"))
             setBackgroundColor(Color.parseColor("#161616"))
@@ -46,7 +44,6 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(statusText)
 
-        // Module Performance Breakdown Card
         moduleStatsText = TextView(this).apply {
             text = "Module PnL Performance:\nLoading..."
             textSize = 11f
@@ -62,7 +59,6 @@ class MainActivity : Activity() {
         moduleStatsText.layoutParams = modParams
         rootLayout.addView(moduleStatsText)
 
-        // Control Buttons Row 1 (Service & Native Seeker Connect)
         val buttonLayout1 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -95,7 +91,6 @@ class MainActivity : Activity() {
         buttonLayout1.addView(btnConnectWallet)
         rootLayout.addView(buttonLayout1)
 
-        // Control Buttons Row 2 (Fund Wallet & Withdraw)
         val buttonLayout2 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -120,7 +115,7 @@ class MainActivity : Activity() {
             setTextColor(Color.parseColor("#FF5555"))
             setOnClickListener {
                 val success = HotWalletManager.withdraw(0.1)
-                val msg = if (success) "Withdrew 0.1 SOL" else "Withdrawal failed (Insufficient funds)"
+                val msg = if (success) "Withdrew 0.1 SOL" else "Withdrawal failed"
                 Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
             }
         }
@@ -129,7 +124,6 @@ class MainActivity : Activity() {
         buttonLayout2.addView(btnWithdrawWallet)
         rootLayout.addView(buttonLayout2)
 
-        // Control Buttons Row 3 (History & Clear)
         val buttonLayout3 = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -153,7 +147,7 @@ class MainActivity : Activity() {
             setTextColor(Color.parseColor("#FF5555"))
             setOnClickListener {
                 StatusManager.clearLogs()
-                StatusManager.appendLog("Logs cleared by user")
+                StatusManager.appendLog("Logs cleared")
             }
         }
 
@@ -161,7 +155,6 @@ class MainActivity : Activity() {
         buttonLayout3.addView(btnClearLogs)
         rootLayout.addView(buttonLayout3)
 
-        // Logs Header
         val logsHeader = TextView(this).apply {
             text = "Live Execution Telemetry:"
             textSize = 13f
@@ -171,7 +164,6 @@ class MainActivity : Activity() {
         }
         rootLayout.addView(logsHeader)
 
-        // Scrollable Live Logs
         val scrollView = ScrollView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -194,7 +186,6 @@ class MainActivity : Activity() {
 
     private fun triggerSeekerMwaBottomSheet() {
         try {
-            // Official Solana Mobile Wallet Adapter (MWA) intent standard triggering Seeker Seed Vault / Seeker ID bottom sheet
             val intentUri = Uri.parse("solana-wallet://v1/authorize?cluster=mainnet-beta&redirect_link=shivapp://connected")
             val intent = Intent(Intent.ACTION_VIEW, intentUri).apply {
                 addCategory(Intent.CATEGORY_BROWSABLE)
@@ -206,7 +197,6 @@ class MainActivity : Activity() {
             StatusManager.appendLog("MWA intent error: ${e.localizedMessage}")
         }
 
-        // Bind the Seeker ID pass account (punitgarud.skr) directly
         val seekerIdPubkey = "Dy95ncLFPhJYeGSdSkVsADid7nchu7EYtDdMhnATxXsh"
         HotWalletManager.importWallet(seekerIdPubkey)
         Toast.makeText(this, "Connected Seeker ID: punitgarud.skr", Toast.LENGTH_LONG).show()
@@ -221,7 +211,7 @@ class MainActivity : Activity() {
                     val canTrade = PerformanceService.canTrade()
                     val pubKey = HotWalletManager.getHotWalletPubkey()
 
-                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade\nSeeker ID: punitgarud.skr ($pubKey)"
+                    statusText.text = "Balance: $balance SOL | Daily Loss: $dailyLoss SOL\nCan Trade: $canTrade\nSeeker ID: punitgarud.skr\n($pubKey)"
                     
                     val modulePnl = StatusManager.getModulePnl()
                     val statsBuilder = StringBuilder("Module PnL Performance:\n")
@@ -233,7 +223,7 @@ class MainActivity : Activity() {
                     val logs = StatusManager.getLogs().takeLast(30).joinToString("\n")
                     logsText.text = logs.ifEmpty { "Scanning analysis modules..." }
                 } catch (e: Exception) {
-                    // Ignore transient polling exceptions
+                    // Ignore transient exceptions
                 }
                 delay(2000)
             }
